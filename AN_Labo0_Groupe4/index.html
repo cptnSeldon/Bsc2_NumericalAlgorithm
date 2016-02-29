@@ -1,0 +1,319 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>Labo 1 - Part 1 | Equipe 4</title>
+</head>
+<body>
+    <h2>Labo 1 - Convertisseur Deximal/Binaire</h2>
+    <p> Nombre de bits 
+        <input type="number" name="nbBits" id="nbBits" value="8" autofocus/>
+        <button type="button" name="btnAdd" id="btnAdd">+</button>
+        <button type="button" name="btnSub" id="btnSub">-</button>
+        <button type="button" name="btnMul" id="btnMul">x</button>
+    </p>
+    <p> Nombre 1 : 
+        <input type="number" name="nb1Dec" id="nb1Dec"/><sub>10</sub>
+        =
+        <!-- <button type="button" name="btnConv1" id="btnConv1">&lt;=&gt;</button> -->
+        <input type="text" name="nb1Bin" id="nb1Bin" maxlength="8"/><sub>2</sub>
+    </p>
+    <p> Nombre 2 : 
+        <input type="number" name="nb2Dec" id="nb2Dec"/><sub>10</sub>
+        =
+        <!-- <button type="button" name="btnCon2" id="btnCon2">&lt;=&gt;</button> -->
+        <input type="text" name="nb2Bin" id="nb2Bin" maxlength="8"/><sub>2</sub>
+    </p>
+    <p> Résultat &nbsp;&nbsp; :
+        <input type="number" name="resultDec" value="0" id="resultDec" disabled/><sub>10</sub>
+        =
+        <input type="text" name="resultBin" id="resultBin" disabled/><sub>2</sub>
+    </p>
+    <p id="overflow"></p>
+    <script>
+        // *****************************************************************************************
+        // Ecoute des différent champs et boutons
+        // *****************************************************************************************
+        document.getElementById("nbBits").addEventListener("keyup", function() { resetInput(); });
+        document.getElementById("nbBits").addEventListener("change", function() { resetInput(); });
+
+        document.getElementById("nb1Dec").addEventListener("keyup", function() { decimalToBinary(1); });
+
+        document.getElementById("nb1Bin").addEventListener("keyup", function() { binaryToDecimal(1); });
+
+        document.getElementById("nb2Dec").addEventListener("keyup", function() { decimalToBinary(2); });
+
+        document.getElementById("nb2Bin").addEventListener("keyup", function() { binaryToDecimal(2); });
+        
+        document.getElementById("btnAdd").addEventListener("click", function() {
+            document.getElementById("resultDec").value = "";
+            document.getElementById("resultBin").value = "";
+            // Vérification des champs avant d'effectuer l'opération
+            if(isInputNotEmpty() && isBinaryInputValid()) {
+                addAndSub(0);
+            }
+        });
+		
+		document.getElementById("btnSub").addEventListener("click", function() {
+            document.getElementById("resultDec").value = "";
+            document.getElementById("resultBin").value = "";
+            // Vérification des champs avant d'effectuer l'opération
+            if(isInputNotEmpty() && isBinaryInputValid()) {
+                addAndSub(1);
+            }
+        });
+		
+		document.getElementById("btnMul").addEventListener("click", function() {
+            document.getElementById("resultDec").value = "";
+            document.getElementById("resultBin").value = "";
+            // Vérification des champs avant d'effectuer l'opération
+            if(isInputNotEmpty() && isBinaryInputValid()) {
+                multiplication();
+            }
+        });
+
+        // *****************************************************************************************
+        // Les diverses fonctions
+        // *****************************************************************************************
+
+        /**
+         * Fonction qui permet de vider les champs
+         */
+        function resetInput() {
+            document.getElementById("nb1Dec").value = "";
+            document.getElementById("nb2Dec").value = "";
+            document.getElementById("nb1Bin").value = "";
+            document.getElementById("nb2Bin").value = "";
+            document.getElementById("resultDec").value = "";
+            document.getElementById("resultBin").value = "";
+            document.getElementById("nb1Bin").maxLength = document.getElementById("nbBits").value;
+            document.getElementById("nb2Bin").maxLength = document.getElementById("nbBits").value;
+        }
+
+        /**
+         * Vérifier si les champs ne sont pas vide
+         */
+        function isInputNotEmpty() {
+            var nb1Dec = document.getElementById("nb1Dec").value;
+            var nb1Bin = document.getElementById("nb1Bin").value;
+            var nb2Dec = document.getElementById("nb2Dec").value;
+            var nb2Bin = document.getElementById("nb2Bin").value;
+            var result = false;
+
+            if((nb1Dec !== "") && (nb1Bin !== "") && (nb2Dec !== "") && (nb2Bin !== "")) {
+                result = true;
+            }
+
+            if(!result) {
+                alert("Un des champs est vide");
+            }
+
+            return result;
+        }
+
+        /**
+         * Vérifier si les champs sont valides
+         */
+        function isBinaryInputValid(){
+            var nb1Bin = document.getElementById("nb1Bin").value.split("");	
+            var nb2Bin = document.getElementById("nb2Bin").value.split("");
+            var length = parseInt(document.getElementById("nbBits").value);
+            var result = false;
+
+            if((nb1Bin.length === length) && (nb2Bin.length === length)) {
+                result = true;
+            }
+
+            if(!result) {
+                alert("Un des champs binaire ne contient pas suffisamment de bits.");
+            }
+
+            return result;
+        }
+
+        /**
+         * Conversion de décimal -> binaire
+         */
+        function decimalToBinary(id) {
+            var nbSigne = document.getElementById("nb" + id + "Dec").value;
+            var nb = Math.abs(document.getElementById("nb" + id + "Dec").value);
+            var maxLength = document.getElementById("nbBits").value;
+            var result = [];
+            var quotient = 1;
+            var i = 0;
+
+            // Conversion décimal -> binaire
+            while (quotient !== 0) {
+                quotient = parseInt(nb / 2);
+                result[i] = nb % 2;
+                nb = quotient;
+                i++;
+            }
+
+            // Si le nombre de bits est insuffisant -> remplir avec des zéro
+            for (i = result.length; i < maxLength; i++) {
+                result[i] = 0;
+            }
+
+            // Si c'est un nombre négatif -> complément à deux
+            if (parseInt(nbSigne) < 0) {
+                result = twoComplement(result);
+            }
+
+            // Vérifier si on ne dépasse pas les limites
+            var limite = Math.pow(2, maxLength) / 2;
+            if (nbSigne < limite && nbSigne >= -limite) {
+                document.getElementById("nb" + id + "Bin").value = result.reverse().join("");
+            } else {
+                alert("Nombre de bits insuffisant pour la conversion du nombre");
+                document.getElementById("nb" + id + "Bin").value = "";
+            }
+        }
+
+        /**
+         * Conversion de binaire -> décimal
+         */
+        function binaryToDecimal(id) {
+            var nb = document.getElementById("nb"+id+"Bin").value;
+            var nbBinTab = nb.split("").reverse();
+            var result = 0;
+            var flag = false;
+
+            // Si le MSB est égale à 1 -> nombre négatif -> complément à deux
+            if(parseInt(nbBinTab[nbBinTab.length-1]) === 1) {
+                nbBinTab = twoComplement(nbBinTab);
+                flag = true;
+            }
+
+            // Conversion binaire -> décimal
+            for(var i = 0; i < nbBinTab.length; i++) {
+                result += nbBinTab[i] * Math.pow(2, i);
+            }
+
+            // Si le nombre est négatif on indique le signe
+            if(flag === true){
+                result = result * (-1);
+            }
+
+            document.getElementById("nb"+id+"Dec").value = result;
+        }
+
+        /**
+         * Calcul du complément à deux pour les nombres négatifs
+         */
+        function twoComplement(nbTabBin) {
+            var result = 0;
+
+            for(var i = 0; i < nbTabBin.length; i++) {
+                if(parseInt(nbTabBin[i]) === 0)
+					nbTabBin[i] = 1;
+                else
+					nbTabBin[i] = 0;
+            }
+
+            var oneTabBin = [];
+            oneTabBin[0] = 1;
+            for(var i = 1; i < nbTabBin.length; i++) {
+                oneTabBin[i] = 0;
+            }
+
+            result = binaryAdd(nbTabBin, oneTabBin);
+
+            return result;
+        }
+
+        /**
+         * Addition ou soustraction en fonction du flag (0 => addition, 1 => soustraction)
+         */
+        function addAndSub(flag) {
+            /* Addition binaire */
+            var nb1Bin = document.getElementById("nb1Bin").value;
+            var nb1BinTab = nb1Bin.split("").reverse();
+            var nb2Bin = document.getElementById("nb2Bin").value;
+            var nb2BinTab = nb2Bin.split("").reverse();
+            /* Addition décimale */
+            var nb1Dec = parseInt(document.getElementById("nb1Dec").value);
+            var nb2Dec = parseInt(document.getElementById("nb2Dec").value);
+
+            if(flag === 1) {
+                nb2BinTab = twoComplement(nb2BinTab);
+                nb2Dec = nb2Dec *(-1);
+            }
+
+            var result = binaryAdd(nb1BinTab, nb2BinTab);
+
+            alert(result.length);
+            if(result.length > maxLength) {
+                alert("Le résultat dépasse le nombre de bits spécifié");
+            }
+
+            document.getElementById("resultBin").value = result.reverse().join("");
+            document.getElementById("resultDec").value = (nb1Dec + nb2Dec);
+        }
+
+        /**
+         * Addition de deux nombres binaire bit à bit
+         */
+        function binaryAdd(nb1BinTab, nb2BinTab){
+            // Le flag = La Retenue
+            var flag = 0;
+            var tmp = 0;
+            var result = [];
+            // Addition bits à bits
+            for(var i = 0; i < nb1BinTab.length; i++) {
+                tmp = parseInt(nb1BinTab[i]) + parseInt(nb2BinTab[i]) + flag;
+                if(tmp <= 1) {
+                    flag = 0;
+                    result[i] = tmp;
+                } else {
+                    flag = 1;
+                    result[i] = tmp % 2;
+                }
+            }
+            return result;
+        }
+
+        /**
+         * Multiplication
+         */
+        function multiplication () {
+            /* Binaire */
+            var nb1Bin = document.getElementById("nb1Bin").value;
+            var nb1BinTab = nb1Bin.split("").reverse();
+            var nb2Bin = document.getElementById("nb2Bin").value;
+            var nb2BinTab = nb2Bin.split("").reverse();
+            /* Décimal */
+            var nb1Dec = parseInt(document.getElementById("nb1Dec").value);
+            var nb2Dec = parseInt(document.getElementById("nb2Dec").value);
+
+            var result = [];
+            for(var i=0; i<nb2BinTab.length+nb1BinTab.length; i++) {
+                result[i] = 0;
+            }
+            var tmp=0;
+            var flag = 0;
+
+            for (var i = 0; i < nb1BinTab.length; i++) {
+                if (parseInt(nb1BinTab[i]) === 1) {
+                    for (var j = 0; j < nb2BinTab.length; j++) {
+                        tmp = parseInt(nb2BinTab[j]) + result[j] + flag;
+                        if(tmp <= 1) {
+                            flag = 0;
+                            result[j] = tmp;
+                        } else {
+                            flag = 1;
+                            result[j] = tmp % 2;
+                        }
+                        //if(flag === 1) {result[j+1] = 1;}
+                    }
+                }
+                nb2BinTab.unshift(0);
+            }
+
+            document.getElementById("resultDec").value = nb1Dec*nb2Dec;
+            document.getElementById("resultBin").value = result.reverse().join("");
+        }
+    </script>
+</body>
+</html>
+
