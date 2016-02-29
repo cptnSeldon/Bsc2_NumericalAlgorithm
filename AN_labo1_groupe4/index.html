@@ -81,6 +81,10 @@
             if(event.keyCode != 110 && event.keyCode != 190 && event.keyCode != 69)
                 decToBin(1);
         });
+        document.getElementById("nbDec2").addEventListener("keyup", function(event) {
+            if(event.keyCode != 110 && event.keyCode != 190 && event.keyCode != 69)
+                decToBin(2);
+        });
 
         //fonctions
         function decToBin(id){
@@ -96,37 +100,52 @@
 
             }
 
-            var nb=parseFloat(document.getElementById("nbDec"+id).value);
-            var nbAbs = Math.abs(nb);
-
-            var exp=parseInt(Math.log(Math.abs(parseInt(nbAbs)))/Math.log(2));
-
-            var tmp=nbAbs/Math.pow(2,exp);
-            var mantis=[];
-            for(var i = 0;i < n;i++) {
-                if(tmp >= 1) {
-                  tmp -= Math.floor(tmp);
-                }
-                tmp *= 2;
-                mantis[i] = Math.floor(tmp);
-            }
-
-            //Exposant
-            var ePrime = d + exp;
             var e = [];
-            var quotient = 1;
-            var i = 0;
-            // Conversion décimal -> binaire
-            while (quotient !== 0) {
-                quotient = parseInt(ePrime / 2);
-                e[i] = ePrime % 2;
-                ePrime = quotient;
-                i++;
+            var mantis=[];
+
+            if(document.getElementById("nbDec"+id).value=="" || document.getElementById("nbDec"+id).value=="0"){
+                for(var i=0;i<n;i++)
+                {
+                    mantis[i]=0;
+                }
+                for(var i=0;i<E;i++)
+                {
+                    e[i]=0;
+                }
+
             }
-            // Si le nombre de bits est insuffisant -> remplir avec des zéro
-            for (i = e.length; i < E; i++) {
-                e[i] = 0;
+            else{
+                var nb=parseFloat(document.getElementById("nbDec"+id).value);
+                var nbAbs = Math.abs(nb);
+
+                var exp=parseInt(Math.log(Math.abs(parseInt(nbAbs)))/Math.log(2));
+
+                var tmp=nbAbs/Math.pow(2,exp);
+                for(var i = 0;i < n;i++) {
+                    if(tmp >= 1) {
+                        tmp -= Math.floor(tmp);
+                    }
+                    tmp *= 2;
+                    mantis[i] = Math.floor(tmp);
+                }
+
+                //Exposant
+                var ePrime = d + exp;
+                var quotient = 1;
+                var i = 0;
+                // Conversion décimal -> binaire
+                while (quotient !== 0) {
+                    quotient = parseInt(ePrime / 2);
+                    e[i] = ePrime % 2;
+                    ePrime = quotient;
+                    i++;
+                }
+                // Si le nombre de bits est insuffisant -> remplir avec des zéro
+                for (i = e.length; i < E; i++) {
+                    e[i] = 0;
+                }
             }
+
 
             // Signe
             var s = (nb < 0) ? 1 : 0;
