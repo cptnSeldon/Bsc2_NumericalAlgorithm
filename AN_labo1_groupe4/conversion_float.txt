@@ -1,0 +1,10 @@
+Labo 1 - équipe 4
+Conversion de nombres flottants
+________________________________
+
+Liste des tâches :
+
+> Conversion décimal - binaire
+> Conversion binaire - décimal
+
+> Addition 
