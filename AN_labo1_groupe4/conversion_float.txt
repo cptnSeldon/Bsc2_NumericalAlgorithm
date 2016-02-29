@@ -8,3 +8,7 @@ Liste des tâches :
 > Conversion binaire - décimal
 
 > Addition 
+>> + +
+>> + -
+>> - +
+>> - -
