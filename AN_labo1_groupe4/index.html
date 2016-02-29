@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <title>Labo 1 - Equipe 4</title>
+    </head>
+    <body>
+        <table>
+            <tr>
+                <td>Nombres de bits</td>
+                <td><input type="number" name="nbBits" id="nbBits"/></td>
+            </tr>
+            <tr>
+                <td>
+                    32 bits IEEE 754 1985
+                    <input type="radio" name="IEEE" id="32bits"/>
+                </td>
+
+            </tr>
+            <tr>
+                <td>64 bits IEEE 754 1985
+                    <input type="radio" name="IEEE" id="64bits"/>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2" align="left">Nombre 1</th>
+            </tr>
+            <tr>
+                <td>Binaire</td>
+                <td>
+                    <input type="text" name="signe1" id="s1"/> <!--signe -->
+                    <input type="text" name="exposant1" id="e1">
+                    <input type="text" name="mantis1" id="m1">
+                </td>
+            </tr>
+            <tr><!--affichage du code binaire reformaté -->
+                <td></td>
+                <td>
+                    <label id="nbBin1">retour 1</label>
+                </td>
+            </tr>
+            <tr>
+                <td>Decimal</td>
+                <td>
+                    <input type="number" name="nbDec1" id="nbDec1"/>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2" align="left">Nombre 2</th>
+            </tr>
+            <tr>
+                <td>Binaire</td>
+                <td>
+                    <input type="text" name="signe2" id="s2"/> <!--signe -->
+                    <input type="text" name="exposant2" id="e2">
+                    <input type="text" name="mantis2" id="m2">
+                </td>
+            </tr>
+            <tr><!--affichage du code binnaire reformaté -->
+                <td></td>
+                <td>
+                    <label id="nbBin2">retour 2</label>
+                </td>
+            </tr>
+            <tr>
+                <td>Decimal</td>
+                <td>
+                    <input type="number" name="nbDec2" id="nbDec2"/>
+                </td>
+            </tr>
+            <tr>
+                <th colspan="2" align="left">Resultats</th>
+            </tr>
+            <tr>
+                <td>Binaire</td>
+                <td>
+                    <input type="number" name="resultatBinaire" id="resultBin" disabled/>
+                </td>
+            </tr>
+            <tr>
+                <td>Decimal</td>
+                <td>
+                    <input type="number" name="resultatDecimal" id="resultDec" disabled/>
+                </td>
+            </tr>
+
+        </table>
+    <script>
+        //evenements
+        document.getElementById("nbBits").addEventListener("keyup", function() { resetInput(); });
+        document.getElementById("nbBits").addEventListener("change", function() { resetInput(); });
+
+        //réinitialise les radioBtn si le focus est sur la saisie de nb de bits
+        document.getElementById("nbBits").addEventListener("focus", function() {
+            document.getElementById("32bits").checked=false;
+            document.getElementById("64bits").checked=false;
+        });
+
+        //fonctions
+        function decToBin(){
+            if(is32Checked()){
+                   
+            }
+        }
+        function is32Checked(){
+            if(document.getElementById("32bits").checked===true){
+                return true;
+            }else {
+                return false;
+            }
+        }
+        function  is64Checked(){
+            if(document.getElementById("64bits").checked===true){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+
+    </script>
+    </body>
+</html>
