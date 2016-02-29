@@ -83,20 +83,20 @@
         });
         document.getElementById("nbDec2").addEventListener("keyup", function(event) {
             if(event.keyCode != 110 && event.keyCode != 190 && event.keyCode != 69)
-                decToBin(2);
+            decToBin(2);
         });
 		//conversion binaire à décimal
-		document.getElementById("s1").addEventListener("keyup", function(event) {
-            //if(event.keyCode != 110 && event.keyCode != 190 && event.keyCode != 69)
-                binToDec(1);
+		document.getElementById("s1").addEventListener("keyup", function() {
+            this.value=this.value.replace(RegExp('[^01]', 'i'),"0");
+            binToDec(1);
         });
-		document.getElementById("e1").addEventListener("keyup", function(event) {
-            //if(event.keyCode != 110 && event.keyCode != 190 && event.keyCode != 69)
-                binToDec(1);
+		document.getElementById("e1").addEventListener("keyup", function() {
+            this.value=this.value.replace(RegExp('[^01]', 'i'),"0");
+            binToDec(1);
         });
-		document.getElementById("m1").addEventListener("keyup", function(event) {
-            //if(event.keyCode != 110 && event.keyCode != 190 && event.keyCode != 69)
-                binToDec(1);
+		document.getElementById("m1").addEventListener("keyup", function() {
+            this.value=this.value.replace(RegExp('[^01]', 'i'),"0");
+            binToDec(1);
         });
 		//
         
@@ -176,7 +176,7 @@
 			var s = parseInt(document.getElementById("s"+id).value);
 			var S = -2*s+1;
 			//exposant
-			var e = document.getElementById("e"+id).split("").reverse();
+			var e = document.getElementById("e"+id).value.split("").reverse();
 			var E = e.length;
 			var ePrime=0;
 			
@@ -188,9 +188,9 @@
 			//2^e'-d -> d
 			var d = Math.pow(2,E-1)-1;
 			//mantissa
-			var m = document.getElementById("m"+id).length;
+			var m = document.getElementById("m"+id).value.length;
 			var n = m+1;
-			var mantTab = document.getElementById("m"+id).split("").reverse();
+			var mantTab = document.getElementById("m"+id).value.split("").reverse();
 			var m_tot=0;
 			for(var i=0; i < mantTab.length; i++){
 			
@@ -202,7 +202,7 @@
 			  
 			var M = (1/Math.pow(2,n))*m_tot;
 			  
-			x = S*M*Math.pow(2,ePrime-d);
+			var x = S*M*Math.pow(2,ePrime-d);
 			
 			document.getElementById("nbDec"+id).value = x;
 		}
