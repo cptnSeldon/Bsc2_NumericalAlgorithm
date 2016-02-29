@@ -11,8 +11,7 @@
                 <td><input type="number" name="nbBits" id="nbBits"/></td>
             </tr>
             <tr>
-                <td>
-                    32 bits IEEE 754 1985
+                <td>32 bits IEEE 754 1985
                     <input type="radio" name="IEEE" id="32bits"/>
                 </td>
 
@@ -22,9 +21,7 @@
                     <input type="radio" name="IEEE" id="64bits"/>
                 </td>
             </tr>
-            <tr>
-                <th colspan="2" align="left">Nombre 1</th>
-            </tr>
+            <tr><th colspan="2" align="left">Nombre 1</th></tr>
             <tr>
                 <td>Binaire</td>
                 <td>
@@ -35,19 +32,13 @@
             </tr>
             <tr><!--affichage du code binaire reformaté -->
                 <td></td>
-                <td>
-                    <label id="nbBin1">retour 1</label>
-                </td>
+                <td><label id="nbBin1">retour 1</label></td>
             </tr>
             <tr>
                 <td>Decimal</td>
-                <td>
-                    <input type="number" name="nbDec1" id="nbDec1"/>
-                </td>
+                <td><input type="number" name="nbDec1" id="nbDec1"/></td>
             </tr>
-            <tr>
-                <th colspan="2" align="left">Nombre 2</th>
-            </tr>
+            <tr><th colspan="2" align="left">Nombre 2</th></tr>
             <tr>
                 <td>Binaire</td>
                 <td>
@@ -58,32 +49,21 @@
             </tr>
             <tr><!--affichage du code binnaire reformaté -->
                 <td></td>
-                <td>
-                    <label id="nbBin2">retour 2</label>
-                </td>
+                <td><label id="nbBin2">retour 2</label></td>
             </tr>
             <tr>
                 <td>Decimal</td>
-                <td>
-                    <input type="number" name="nbDec2" id="nbDec2"/>
-                </td>
+                <td><input type="number" name="nbDec2" id="nbDec2"/></td>
             </tr>
-            <tr>
-                <th colspan="2" align="left">Resultats</th>
-            </tr>
+            <tr><th colspan="2" align="left">Resultats</th></tr>
             <tr>
                 <td>Binaire</td>
-                <td>
-                    <input type="number" name="resultatBinaire" id="resultBin" disabled/>
-                </td>
+                <td><input type="number" name="resultatBinaire" id="resultBin" disabled/></td>
             </tr>
             <tr>
                 <td>Decimal</td>
-                <td>
-                    <input type="number" name="resultatDecimal" id="resultDec" disabled/>
-                </td>
+                <td><input type="number" name="resultatDecimal" id="resultDec" disabled/></td>
             </tr>
-
         </table>
     <script>
         //evenements
@@ -97,45 +77,64 @@
         });
 
         //conversion
-        document.getElementById("nbDec1").addEventListener("keyup", function() { decToBin(1); });
+        document.getElementById("nbDec1").addEventListener("keyup", function(event) {
+            if(event.keyCode != 110 && event.keyCode != 190 && event.keyCode != 69)
+                decToBin(1);
+        });
 
         //fonctions
         function decToBin(id){
             if(is32Checked()){
-                var d=127;
-                var E=8;
-                var n=23;
+                var d = 127;
+                var E = 8;
+                var n = 23;
             }else if(is64Checked()){
-                var d=1023;
-                var E=11;
-                var n=52;
+                var d = 1023;
+                var E = 11;
+                var n = 52;
             }else{
 
             }
 
-            var nb=document.getElementById("nbDec"+id).value;
+            var nb=parseFloat(document.getElementById("nbDec"+id).value);
+            var nbAbs = Math.abs(nb);
 
-            var exp=parseInt(Math.log(Math.abs(parseInt(nb)))/Math.log(2));
+            var exp=parseInt(Math.log(Math.abs(parseInt(nbAbs)))/Math.log(2));
 
-            var tmp=nb/Math.pow(2,exp);
+            var tmp=nbAbs/Math.pow(2,exp);
             var mantis=[];
-            for(var i=0;i<n;i++)
-            {
-                if(tmp>=1)
-                {
-                  tmp-=Math.floor(tmp);
+            for(var i = 0;i < n;i++) {
+                if(tmp >= 1) {
+                  tmp -= Math.floor(tmp);
                 }
-                tmp*=2;
-                mantis[i]=Math.floor(tmp);
+                tmp *= 2;
+                mantis[i] = Math.floor(tmp);
             }
 
             //Exposant
-            var e=d+exp;
+            var ePrime = d + exp;
+            var e = [];
+            var quotient = 1;
+            var i = 0;
+            // Conversion décimal -> binaire
+            while (quotient !== 0) {
+                quotient = parseInt(ePrime / 2);
+                e[i] = ePrime % 2;
+                ePrime = quotient;
+                i++;
+            }
+            // Si le nombre de bits est insuffisant -> remplir avec des zéro
+            for (i = e.length; i < E; i++) {
+                e[i] = 0;
+            }
 
+            // Signe
+            var s = (nb < 0) ? 1 : 0;
 
-            document.getElementById("m1").value=mantis.join("");
-
-
+            // Affichage du résultat
+            document.getElementById("s"+id).value = s;
+            document.getElementById("e"+id).value = e.reverse().join("");
+            document.getElementById("m"+id).value = mantis.join("");
         }
         function is32Checked(){
             if(document.getElementById("32bits").checked===true){
