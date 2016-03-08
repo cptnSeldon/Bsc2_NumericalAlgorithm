@@ -242,7 +242,7 @@
 
             var result = binaryAdd(nb1BinTab, nb2BinTab);
 
-            alert(result.length);
+			maxLength = document.getElementById("nbBits").value;
             if(result.length > maxLength) {
                 alert("Le résultat dépasse le nombre de bits spécifié");
             }
