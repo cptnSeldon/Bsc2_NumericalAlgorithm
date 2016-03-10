@@ -18,11 +18,9 @@
             border-bottom: 1px solid black;
         }
     </style>
-    <body>
+    <body onload="resetInput()">
     <h2>Labo 1 - Codage flottant</h2>
-    <p><label>Nombre de bits <input type="number" name="nbBits" id="nbBits" value="8" max="80" min="4" autofocus/></label></p>
-    <p><label>32 bits <sub>(IEE Std 754-1985)</sub><input type="radio" name="ieee" id="32bits"/></label></p>
-    <p><label>64 bits <sub>(IEE Std 754-1985)</sub><input type="radio" name="ieee" id="64bits"/></label></p>
+    <p><label>Nombre de bits <input type="number" name="nbBits" id="nbBits" value="32" min="4" autofocus/></label></p>
     <br/>
     <!-- TABLE -->
     <table>
@@ -79,20 +77,10 @@
         // Listening inputs
         // *****************************************************************************************
         document.getElementById("nbBits").addEventListener("change", function() {
-            this.value = (parseInt(this.value) < 4) ? 4 : this.value;
-            this.value = (parseInt(this.value) > 80) ? 80 : this.value;
+            this.value = (parseInt(this.value) < 6) ? 6 : this.value;
+            this.value = (this.value == "") ? 6 : this.value;
             resetInput();
         });
-        document.getElementById("32bits").addEventListener("click", function() {resetInput();});
-        document.getElementById("64bits").addEventListener("click", function() {resetInput();});
-
-        // Initialize radio buttons when the focus is on the input "nbBits"
-        document.getElementById("nbBits").addEventListener("focus", function() {
-            document.getElementById("32bits").checked=false;
-            document.getElementById("64bits").checked=false;
-            resetInput();
-        });
-
         // NUMBER 1
         // Conversion decimal to binary
         document.getElementById("nbDec1").addEventListener("keyup", function (event) {decToBin(1);});
@@ -131,26 +119,13 @@
             } else {
                 exp = Math.floor(exp);
             }
+            var N = parseInt(document.getElementById("nbBits").value);
+            var E = document.getElementById("e"+id).maxLength;
+            var d = Math.pow(2,E-1)-1;
+            var n = N-E-1;
             var e = [];
             var m = [];
-            var E = 0;
-            var n = 0;
-            var d = 0;
-            var args = []
-            if(isRadioBtnChecked(args)) {
-                d = args[0];
-                E = args[1];
-                n = args[2];
-            }else{
-                var N = document.getElementById("nbBits").value;
-                if(isFinite(exp)) {
-                    E = Math.ceil(1.0 + (Math.log(Math.abs(exp) + 1.0) / Math.log(2.0)));
-                } else {
-                    E = N/2;
-                }
-                d = Math.pow(2,E-1)-1;
-                n = N-E-1;
-            }
+
             if(isNaN(nb) || nb == 0){
                 // Mantissa
                 for(var i= 0;i<n;i++) {
@@ -175,7 +150,6 @@
                 var ePrime = d + exp;
                 var quotient = 1;
                 var i = 0;
-                // Conversion décimal -> binaire
                 while (i < E) {
                     quotient = parseInt(ePrime / 2);
                     e[i] = ePrime % 2;
@@ -243,8 +217,6 @@
 				alert("Les deux nombres n'ont pas le même nombre de bits ou ne sont pas répartis de la même manière.");
 			} else if (s1.length == 0 || e1.length == 0 || m1.length == 0) {
 				alert("Les champs sont vide.");
-			}else if (s1.length + e1.length + m1.length > document.getElementById("nbBits").value && !isRadioBtnChecked()){
-				alert("Les nombres dépassent la taille définie.");
 			} else {
                 // Addition Binary
 				document.getElementById("resultBin").value = "Addition of two binary numbers";
@@ -265,45 +237,8 @@
             if(/[^01]/i.test(input.value)){
                 input.value = input.value.replace(RegExp('[^01]', 'i'), "0");
             }
-            var s = document.getElementById("s"+id).value.length;
-            var e = document.getElementById("e"+id).value.length;
-            var m = document.getElementById("m"+id).value.length;
-            var N = document.getElementById("nbBits").value;
-            // Inform the user if the binary number is too long
-            if(s+e+m <= N || isRadioBtnChecked()) {
-                copyInputToLabel(id);
-                binToDec(id);
-            } else {
-                document.getElementById("nbDec"+id).value = "";
-                alert("Le nombre " + id + " a trop de bits.");
-            }
-        }
-
-        /**
-         * Verify if the 32 or 64 bits radio button is checked.
-         * The list passed by reference is used to return the values defined by the standard
-         * @param args : List passed by reference
-         */
-        function  isRadioBtnChecked(args){
-            if(document.getElementById("32bits").checked == true){
-                if(args !== undefined) {
-                    args[0] = 127;
-                    args[1] = 8;
-                    args[2] = 23;
-                    args[3] = 32;
-                }
-                return true;
-            } else if(document.getElementById("64bits").checked == true){
-                if(args !== undefined) {
-                    args[0] = 1023;
-                    args[1] = 11;
-                    args[2] = 52;
-                    args[3] = 64;
-                }
-                return true;
-            }else{
-                return false;
-            }
+            copyInputToLabel(id);
+            binToDec(id);
         }
 
         /**
@@ -319,21 +254,9 @@
             }
             document.getElementById("resultBin").value = "";
             document.getElementById("resultDec").value = "";
-            var maxLength = document.getElementById("nbBits").value;
-            var args = [];
-            var E = 0;
-            var n = 0;
-
-            if(maxLength != "" && maxLength != "0") {
-                E = parseInt(maxLength)-2;
-                n = E;
-                maxLength = maxLength;
-            }
-            if (isRadioBtnChecked(args)) {
-                E = args[1];
-                n = args[2];
-                maxLength = args[3];
-            }
+            var N = document.getElementById("nbBits").value;
+            var E = Math.ceil(3*(Math.log(N)/Math.log(2))-7);
+            var n = N-E-1;
 
             for(var id=1; id<=2; id++) {
                 document.getElementById("e"+id).maxLength = E;
@@ -342,8 +265,8 @@
                 document.getElementById("m"+id).setAttribute("size", n);
             }
 
-            document.getElementById("resultBin").maxLength = maxLength;
-            document.getElementById("resultBin").setAttribute("size", maxLength);
+            document.getElementById("resultBin").maxLength = N;
+            document.getElementById("resultBin").setAttribute("size", N);
         }
 
         /**
