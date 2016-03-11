@@ -219,12 +219,114 @@
 				alert("Les champs sont vide.");
 			} else {
                 // Addition Binary
-				document.getElementById("resultBin").value = "Addition of two binary numbers";
+				//document.getElementById("resultBin").value = "Addition of two binary numbers";
 				
 				// Addition Decimal
 				var resultDec = parseFloat(document.getElementById("nbDec1").value) + parseFloat(document.getElementById("nbDec2").value);
 				document.getElementById("resultDec").value = resultDec;
+				
+				
+				
+				/** get exponent */
+				var exp1 = getExponent(e1);
+				var exp2 = getExponent(e2);
+				
+				alert(exp1);
+				
+				//si exp1 > exp2 : positif -> le 2 devra shifter
+				//si exp2 > exp1 : négatif -> le 1 devra shifter
+				//si exp1 = exp2 : 0 -> pas de shift
+				/** get shift */
+				var shift = getShift(exp1,exp2);
+				
+				//alert(shift);
+				
+				//shift is possible
+				if(Math.abs(shift) <= m1.length-1){
+					
+					//bits1 shift
+					if(shift < 0){
+							m1.unshift(Math.abs(shift));
+				  } 
+				  //bits2 shift
+				  else if(shift > 0){
+					  m2.unshift(Math.abs(shift));
+				  }
+				}
+				//shift is not possible
+				else{
+					if(shift < 0)
+						document.getElementById("resultBin").value = document.getElementById("nbBin1").value;
+					else
+						document.getElementById("resultBin").value = document.getElementById("nbBin2").value;
+				}
+				
+				var result = [];
+				/** addition */
+				var flag = binaryAdd(m1, m2, result);
+				
+				alert("Result : "+result+"\nFlag : "+flag);
+				
 			}
+			
+        }
+		/** getting shift */
+		function getShift(_exp1, _exp2){
+				
+			var x = 0;
+			
+			if(_exp1 > _exp2){
+					x = 1;
+			}
+			else if(_exp1 < _exp2){
+					x = -1;
+			}
+			
+				return x*Math.abs(_exp1 - _exp2);
+		}
+
+		/** Exponent */
+		function getExponent(_exponent){
+				
+			var e = _exponent.split("").reverse();
+			var E = e.length;
+			var ePrime=0;
+
+		  for(var i=0; i < E; i++){
+			
+			if(e[i]=="1"){
+				ePrime += Math.pow(2,i);
+			}
+		  }
+		   
+				exp = ePrime - (Math.pow(2,E-1)-1);
+			
+			//alert("Exposant : "+exp+"\nePrime : "+ePrime+"\nd : "+ (Math.pow(2,E-1)-1));
+				
+			return exp;
+		}
+		
+		function binaryAdd(nb1, nb2, result){
+            // Le flag = La Retenue
+            var flag = 0;
+            var tmp = 0;
+			nb1BinTab = nb1.split("").reverse();
+			nb2BinTab = nb2.split("").reverse();
+            // Addition bits à bits
+            for(var i = 0; i < nb1BinTab.length; i++) {
+                tmp = parseInt(nb1BinTab[i]) + parseInt(nb2BinTab[i]) + flag;
+                if(tmp <= 1) {
+                    flag = 0;
+                    result[i] = tmp;
+                } else {
+                    flag = 1;
+                    result[i] = tmp % 2;
+                }
+            }
+			
+			result.reverse();
+			
+            return flag;
         }
 
         /**
