@@ -328,6 +328,27 @@
 			
             return flag;
         }
+		//two's complement
+		function twoComplement(nbTabBin) {
+            var result = 0;
+
+            for(var i = 0; i < nbTabBin.length; i++) {
+                if(parseInt(nbTabBin[i]) === 0)
+					nbTabBin[i] = 1;
+                else
+					nbTabBin[i] = 0;
+            }
+
+            var oneTabBin = [];
+            oneTabBin[0] = 1;
+            for(var i = 1; i < nbTabBin.length; i++) {
+                oneTabBin[i] = 0;
+            }
+
+            result = binaryAdd(nbTabBin, oneTabBin);
+
+            return result;
+        }
 
         /**
          * Call by the input listener (Binary input)
