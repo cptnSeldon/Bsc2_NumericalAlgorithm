@@ -225,7 +225,7 @@
 				var resultDec = parseFloat(document.getElementById("nbDec1").value) + parseFloat(document.getElementById("nbDec2").value);
 				document.getElementById("resultDec").value = resultDec;
 				
-				
+				//-> convertir les valeurs sous format tableau
 				
 				/** get exponent */
 				var exp1 = getExponent(e1);
@@ -239,7 +239,7 @@
 				/** get shift */
 				var shift = getShift(exp1,exp2);
 				
-				//alert(shift);
+				alert(shift);
 				
 				//shift is possible
 				if(Math.abs(shift) <= m1.length-1){
@@ -265,7 +265,7 @@
 				/** addition */
 				var flag = binaryAdd(m1, m2, result);
 				
-				alert("Result : "+result+"\nFlag : "+flag);
+				//alert("Result : "+result+"\nFlag : "+flag+"\nshift : "+shift);
 				
 			}
 			
