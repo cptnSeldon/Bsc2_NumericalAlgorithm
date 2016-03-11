@@ -1,9 +1,9 @@
-var sign1 = "1";
-var exponent1 = "00000011"
+var sign1 = "0";
+var exponent1 = "10000000"
 var mantissa1 = "111"
 
 var sign2 = "0";
-var exponent2 = "00000000"
+var exponent2 = "00111111"
 var mantissa2 = "111"
 
 addition(sign1, exponent1, mantissa1, sign2, exponent2);
@@ -16,24 +16,33 @@ function addition(_sign1, _exponent1, _mantissa1, _sign2, _exponent2, _mantissa2
     var exp1 = getExponent(exponent1);
 		var exp2 = getExponent(exponent2);
     
+    alert(exp1);
+    
     //si exp1 > exp2 : positif -> le 2 devra shifter
 		//si exp2 > exp1 : négatif -> le 1 devra shifter
 		//si exp1 = exp2 : 0 -> pas de shift
     /** get shift */
     var shift = getShift(exp1,exp2);
     
+    //alert(shift);
+    
     //bits1 shift
-    if(shift < 0){
-    		_mantissa1.unshift(Math.abs(shift));
-    } 
-    //bits2 shift
-    else if(shift > 0){
-    		_mantissa2.unshift(Math.abs(shift));
+    if(Math.abs(shift) < _mantissa1.length-1){
+    	if(shift < 0){
+    			_mantissa1.unshift(Math.abs(shift));
+      } 
+      //bits2 shift
+      else if(shift > 0){
+          _mantissa2.unshift(Math.abs(shift));
+      }
+    }
+    else{
+    	
     }
     
+    
     /** addition */
-    
-    
+        
 }
 
 /** getting shift */
@@ -64,11 +73,10 @@ function getExponent(_exponent){
     	ePrime += Math.pow(2,i);
     }
   }
-    //alert(ePrime);
-    //alert(Math.pow(2,E-1)-1);
-		exp = ePrime - Math.pow(2,E-1)-1;
+   
+		exp = ePrime - (Math.pow(2,E-1)-1);
     
-    //alert(exp);
+    //alert("Exposant : "+exp+"\nePrime : "+ePrime+"\nd : "+ (Math.pow(2,E-1)-1));
 		
     return exp;
 }
