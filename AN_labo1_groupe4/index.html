@@ -18,7 +18,7 @@
             border-bottom: 1px solid black;
         }
     </style>
-    <body onload="resetInput()">
+    <body onload="init()">
     <h2>Labo 1 - Codage flottant</h2>
     <p><label>Nombre de bits <input type="number" name="nbBits" id="nbBits" value="32" min="4" autofocus/></label></p>
     <br/>
@@ -80,6 +80,10 @@
             this.value = (parseInt(this.value) < 6) ? 6 : this.value;
             this.value = (this.value == "") ? 6 : this.value;
             resetInput();
+            if(document.getElementById("nbDec1").value != "")
+                    decToBin(1);
+            if(document.getElementById("nbDec2").value != "")
+                    decToBin(2);
         });
         // NUMBER 1
         // Conversion decimal to binary
@@ -113,12 +117,7 @@
             // Sign of value. Detect the difference between positive and negative zero
             // Example : 1/(-0) = "-Infinity" AND 1/0 = "Infinity"
             var S = 1/document.getElementById("nbDec"+id).value;
-            var exp = Math.log(nb)/Math.log(2.0);
-            if(exp >= 0){
-                exp = parseInt(exp);
-            } else {
-                exp = Math.floor(exp);
-            }
+            var exp = Math.floor(Math.log(nb)/Math.log(2.0));
             var N = parseInt(document.getElementById("nbBits").value);
             var E = document.getElementById("e"+id).maxLength;
             var d = Math.pow(2,E-1)-1;
@@ -157,9 +156,9 @@
                     i++;
                 }
             }
-            // Signe
+            // Sign
             var s = (S < 0) ? 1 : 0;
-            // Affichage du résultat
+            // Display result
             document.getElementById("s"+id).value = s;
             document.getElementById("e"+id).value = e.reverse().join("");
             document.getElementById("m"+id).value = m.join("");
@@ -171,7 +170,7 @@
          * @param id : Reference the number to convert
          */
 		function binToDec(id){
-			// Signe
+			// Sign
 			var s = parseInt(document.getElementById("s"+id).value);
 			var S = -2*s+1;
 			// Exposant
@@ -218,100 +217,144 @@
 			} else if (s1.length == 0 || e1.length == 0 || m1.length == 0) {
 				alert("Les champs sont vide.");
 			} else {
-                // Addition Binary
-				//document.getElementById("resultBin").value = "Addition of two binary numbers";
-				
 				// Addition Decimal
 				var resultDec = parseFloat(document.getElementById("nbDec1").value) + parseFloat(document.getElementById("nbDec2").value);
 				document.getElementById("resultDec").value = resultDec;
-				
+
+                // Addition Binary
+
 				//-> convertir les valeurs sous format tableau
+                m1 = "1" + m1;
+                m2 = "1" + m2;
+
+                m1 = m1.split("");
+                m2 = m2.split("");
 				
 				/** get exponent */
 				var exp1 = getExponent(e1);
 				var exp2 = getExponent(e2);
-				
-				alert(exp1);
-				
+
 				//si exp1 > exp2 : positif -> le 2 devra shifter
 				//si exp2 > exp1 : négatif -> le 1 devra shifter
 				//si exp1 = exp2 : 0 -> pas de shift
-				/** get shift */
-				var shift = getShift(exp1,exp2);
-				
-				alert(shift);
-				
-				//shift is possible
+				// Get shift
+				var shift = getShift(parseInt(exp1), parseInt(exp2));
+                var eResult = e1;
+
+				// Shift is possible
 				if(Math.abs(shift) <= m1.length-1){
-					
-					//bits1 shift
-					if(shift < 0){
-							m1.unshift(Math.abs(shift));
-				  } 
-				  //bits2 shift
-				  else if(shift > 0){
-					  m2.unshift(Math.abs(shift));
-				  }
+                    // Bits1 shift
+                    if(shift < 0){
+                        for(var i=0; i<shift; i++) {
+                            m1.unshift("0");
+                            m1.pop();
+                        }
+                        eResult = e2;
+                    }
+                    // Bits2 shift
+                    else if(shift > 0){
+                        for(var i=0; i<shift; i++) {
+                            m2.unshift("0");
+                            m2.pop();
+                        }
+                    }
 				}
-				//shift is not possible
+				// Shift is not possible
 				else{
 					if(shift < 0)
 						document.getElementById("resultBin").value = document.getElementById("nbBin1").value;
 					else
 						document.getElementById("resultBin").value = document.getElementById("nbBin2").value;
-				}
-				
-				var result = [];
-				/** addition */
-				var flag = binaryAdd(m1, m2, result);
-				
-				//alert("Result : "+result+"\nFlag : "+flag+"\nshift : "+shift);
-				
+                }
+				// Addition
+                var mResult = [];
+				var flag = binaryAdd(m1.reverse(), m2.reverse(), mResult);
+                if(flag == 1) {
+                    if (mResult[mResult.length - 1] == "1") {
+                        if (mResult[mResult.length - 2] == "1") {
+                            mResult.pop();
+                            var old_result = mResult;
+                            var one = [];
+                            for (var i = 0; i < mResult.length - 1; i++) {
+                                one[i] = "0";
+                            }
+                            one[mResult.length - 1] = "1";
+                            binaryAdd(old_result.reverse(), one.reverse(), mResult);
+                        } else {
+                            mResult.pop();
+                        }
+                    } else {
+                        mResult.pop();
+                    }
+                } else {
+                    mResult.shift();
+                }
+
+                eResult = eResult.split("");
+                var a = flag;
+                var quotient = 1;
+                var i = 0;
+                var shiftBin = [];
+                while (i < eResult.length) {
+                    quotient = parseInt(a/ 2);
+                    shiftBin[i] = a % 2;
+                    a = quotient;
+                    i++;
+                }
+                var old_result = eResult;
+                binaryAdd(old_result.reverse(), shiftBin, eResult);
+                document.getElementById("resultBin").value = s1 + eResult.join("") + mResult.join("");
 			}
 			
         }
-		/** getting shift */
-		function getShift(_exp1, _exp2){
-				
+		/**
+         *  Get shift (difference between two exponents)
+         *  @param exp1     : First exponent (int)
+         *  @param exp2     : Second exponent (int)
+         *  @return shift   : Value of shift
+         */
+		function getShift(exp1, exp2){
 			var x = 0;
-			
-			if(_exp1 > _exp2){
-					x = 1;
+			if(exp1 > exp2){
+                x = 1;
 			}
-			else if(_exp1 < _exp2){
-					x = -1;
+			else if(exp1 < exp2){
+                x = -1;
 			}
-			
-				return x*Math.abs(_exp1 - _exp2);
+            return x*Math.abs(exp1 - exp2);
 		}
 
-		/** Exponent */
-		function getExponent(_exponent){
-				
-			var e = _exponent.split("").reverse();
-			var E = e.length;
-			var ePrime=0;
+		/**
+         *  Get the exponent in decimal
+         *  @param exponent : Binary Exponent (String)
+         *  @return exp     : Decimal Exponent
+         */
+        function getExponent(exponent){
 
-		  for(var i=0; i < E; i++){
-			
-			if(e[i]=="1"){
-				ePrime += Math.pow(2,i);
-			}
-		  }
-		   
-				exp = ePrime - (Math.pow(2,E-1)-1);
-			
-			//alert("Exposant : "+exp+"\nePrime : "+ePrime+"\nd : "+ (Math.pow(2,E-1)-1));
-				
-			return exp;
-		}
-		
-		function binaryAdd(nb1, nb2, result){
+            var e = exponent.split("").reverse();
+            var E = e.length;
+            var ePrime=0;
+
+            for(var i=0; i < E; i++){
+                if(e[i]=="1"){
+                    ePrime += Math.pow(2,i);
+                }
+            }
+            exp = ePrime - (Math.pow(2,E-1)-1);
+            return exp;
+        }
+
+        /**
+         *  Binary Addition
+         *  @param nb1      : First binary number (Array)
+         *  @param nb2      : Second binary number (Array)
+         *  @param result   : Result of addition (Reference)
+         *  @return flag    : Overflow
+         */
+		function binaryAdd(nb1BinTab, nb2BinTab, result){
             // Le flag = La Retenue
             var flag = 0;
             var tmp = 0;
-			nb1BinTab = nb1.split("").reverse();
-			nb2BinTab = nb2.split("").reverse();
             // Addition bits à bits
             for(var i = 0; i < nb1BinTab.length; i++) {
                 tmp = parseInt(nb1BinTab[i]) + parseInt(nb2BinTab[i]) + flag;
@@ -323,12 +366,14 @@
                     result[i] = tmp % 2;
                 }
             }
-			
-			result.reverse();
+			result = result.reverse();
 			
             return flag;
         }
-		//two's complement
+		/**
+         *  Calculate the two's Complement
+         *  @param nbTabBin : Binary number in array
+         */
 		function twoComplement(nbTabBin) {
             var result = 0;
 
@@ -348,6 +393,12 @@
             result = binaryAdd(nbTabBin, oneTabBin);
 
             return result;
+        }
+
+        function init() {
+            resetInput()
+            document.getElementById("nbDec1").value = "";
+            document.getElementById("nbDec2").value = "";
         }
 
         /**
@@ -372,7 +423,6 @@
                 document.getElementById("s"+id).value = "";
                 document.getElementById("e"+id).value = "";
                 document.getElementById("m"+id).value = "";
-                document.getElementById("nbDec"+id).value = "";
                 document.getElementById("nbBin"+id).innerHTML = "";
             }
             document.getElementById("resultBin").value = "";
