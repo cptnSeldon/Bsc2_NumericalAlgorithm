@@ -163,8 +163,7 @@
                 for(var i=0;i<E;i++) {
                     e[i] = 0;
                 }
-            }
-            else {
+			}else {
                 // Mantissa
                 var tmp = nb / Math.pow(2,exp);
                 for(var i = 0;i <= n;i++) {
@@ -196,12 +195,12 @@
             }
             // Sign
             var s = (S < 0) ? 1 : 0;
-			
-            // Display result
-            document.getElementById("s"+id).value = s;
-            document.getElementById("e"+id).value = e.reverse().join("");
-            document.getElementById("m"+id).value = m.join("");
-            copyInputToLabel(id);
+	
+			// Display result
+			document.getElementById("s"+id).value = s;
+			document.getElementById("e"+id).value = e.reverse().join("");
+			document.getElementById("m"+id).value = m.join("");
+			copyInputToLabel(id);				
         }
 
         /**
@@ -235,10 +234,14 @@
             // If mantissa and exposant are equal to 0, the result is 0
             M += (M > 0 || ePrime > 0) ? Math.pow(2, n) : 0;
 			M /= Math.pow(2, n);
-
-			// Display Result
-			var x = S*M*Math.pow(2,ePrime-d);
-			document.getElementById("nbDec"+id).value = x;
+			
+			if(ePrime != (Math.pow(2,E)-1)) {	
+				// Display Result
+				var x = S*M*Math.pow(2,ePrime-d);
+				document.getElementById("nbDec"+id).value = x;
+			} else {
+				document.getElementById("nbDec"+id).value = "";
+			}
 		}
 
         /**
