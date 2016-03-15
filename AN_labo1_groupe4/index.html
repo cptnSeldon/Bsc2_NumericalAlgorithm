@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<br>
+<html>
     <head>
         <meta charset="utf-8"/>
         <title>Labo 1 - Equipe 4</title>
@@ -18,9 +18,9 @@
             border-bottom: 1px solid black;
         }
     </style>
-    <br onload="init()">
+    <body onload="init()">
     <h2>Labo 1 - Codage flottant</h2>
-    <p><label>Nombre de bits <input type="number" name="nbBits" id="nbBits" value="32" min="4" autofocus/></label></p>
+    <p><label>Nombre de bits <input type="number" name="nbBits" id="nbBits" value="32" min="6" max="256" autofocus/></label></p>
     <br/>
     <!-- TABLE -->
     <table>
@@ -72,8 +72,9 @@
         </tr>
     </table>
     <!-- TABLE END -->
-    <!-- LABEL START -->
-    <h2>Mode d'Emploi</h2>
+	<br>
+	<!-- LABEL START -->
+    <h3>Mode d'Emploi</h3>
     <p>
         <ul>
             <li>Choisir le nombre de bits total.</li>
@@ -83,22 +84,20 @@
                 la touche [+] pour effectuer l'addition.</li>
         </ul>
     </p>
-    <h2>Spécificités</h2>
-    <br>
-        L'application permet de convertir des nombres décimaux flottants en binaire (vice versa)
-        ainsi que de faire des additions. </br>
-        Le calcul de la taille des bits de l'exposant a été déterminé en faisant
-        un graphe des valeurs en utilisant les informations liées à la norme IEEE754.</br>
-        Après avoir récupéré ces valeurs, une courbe de tendance logarithmique est appliquée sur le graphe.</br>
-        Grâce à elle, on a pu établir que la relation entre le nombre total de bits et celui de l'exposant
-        est approximativement de :</br></br><center>3*Log<sub>2</sub>(nombre de bits total) - 7</center> </br>Ainsi, on arrive à minimiser les erreurs qui
-        auraient pu survenir en utilisant un nombre de bits plus aléatoire.</br></br>
-        Le nombre de bits total minimal est de 6 bits, en suivant cette formule.</br>
-        Le nombre de bits total maximal a été fixé à 256 bien qu'à partir d'environ 80 bits il s'ensuit une longue suite
-        composée uniquement de 0.
-        </br></br>
-        On n'a pas réussi à rendre l'addition possible pour les nombres qui ne sont pas du même signe.
-    </p>
+    <h3>Spécificités</h3>
+    <p>L'application permet de convertir des nombres décimaux flottants en binaire (vice versa) ainsi que de faire des additions.</p>
+	<p>Le calcul de la taille des bits de l'exposant a été déterminé en faisant un graphe des valeurs en utilisant les informations liées à la norme IEEE754.
+		<br>Après avoir récupéré ces valeurs, une courbe de tendance logarithmique est appliquée sur le graphe.
+		<br>Grâce à elle, on a pu établir que la relation entre le nombre total de bits et celui de l'exposant est approximativement de :
+	</p>
+	<p>3*Log<sub>2</sub>(nombre_de_bits_total) - 7</p>
+	<p>Ainsi, on arrive à minimiser les erreurs qui auraient pu survenir en utilisant un nombre de bits plus aléatoire.</p>
+	<p>Le nombre de bits total minimal est de 6 bits, en suivant cette formule.
+       <br>Le nombre de bits total maximal a été fixé à 256 bien qu'à partir d'environ 80 bits il s'ensuit une longue suite composée uniquement de 0.
+	</p>
+    <p>On n'a pas réussi à rendre l'addition possible pour les nombres qui ne sont pas du même signe.</p>
+	<hr>
+	<sup>Equipe 4</sup>
     <!-- LABEL END -->
     <script>
         // *****************************************************************************************
@@ -107,6 +106,7 @@
         document.getElementById("nbBits").addEventListener("change", function() {
             this.value = (parseInt(this.value) < 6) ? 6 : this.value;
             this.value = (this.value == "") ? 6 : this.value;
+			this.value = (parseInt(this.value) > 256) ? 256 : this.value;
             resetInput();
             if(document.getElementById("nbDec1").value != "")
                     decToBin(1);
@@ -153,6 +153,7 @@
             var e = [];
             var m = [];
 
+			// If zero
             if(isNaN(nb) || nb == 0){
                 // Mantissa
                 for(var i= 0;i<n;i++) {
@@ -166,14 +167,23 @@
             else {
                 // Mantissa
                 var tmp = nb / Math.pow(2,exp);
-                for(var i = 0;i < n;i++) {
+                for(var i = 0;i <= n;i++) {
                     if(tmp >= 1) {
                         tmp -= parseInt(tmp);
                     }
                     tmp *= 2;
                     m[i] = parseInt(tmp);
                 }
-                //Exposant
+				// Round Mantissa
+				var tmp = m.pop()
+				if(tmp == 1) {
+					var one = [];
+					var old_m = m;
+					for (var i = 0; i < m.length; i++) { one[i] = "0";}
+                    one[m.length - 1] = "1";
+                    binaryAdd(old_m.reverse(), one.reverse(), m);
+				}
+                //Exponent
                 var ePrime = d + exp;
                 var quotient = 1;
                 var i = 0;
@@ -186,6 +196,7 @@
             }
             // Sign
             var s = (S < 0) ? 1 : 0;
+			
             // Display result
             document.getElementById("s"+id).value = s;
             document.getElementById("e"+id).value = e.reverse().join("");
@@ -225,6 +236,7 @@
             M += (M > 0 || ePrime > 0) ? Math.pow(2, n) : 0;
 			M /= Math.pow(2, n);
 
+			// Display Result
 			var x = S*M*Math.pow(2,ePrime-d);
 			document.getElementById("nbDec"+id).value = x;
 		}
@@ -233,7 +245,6 @@
          * Addition of two binary/decimal numbers
          */
         function addition() {
-            //alert("Addition of two binary numbers");
 			var s1 = document.getElementById("s1").value;
 			var e1 = document.getElementById("e1").value;
 			var m1 = document.getElementById("m1").value;
@@ -244,27 +255,23 @@
 				alert("Les deux nombres n'ont pas le même nombre de bits ou ne sont pas répartis de la même manière.");
 			} else if (s1.length == 0 || e1.length == 0 || m1.length == 0) {
 				alert("Les champs sont vide.");
+			} else if (s1 != s2) {
+				alert("Les nombres ne sont pas de même signe.");
 			} else {
-				// Addition Decimal
-				var resultDec = parseFloat(document.getElementById("nbDec1").value) + parseFloat(document.getElementById("nbDec2").value);
-				document.getElementById("resultDec").value = resultDec;
-
                 // Addition Binary
-
-				//-> convertir les valeurs sous format tableau
+				// Convert to array
                 m1 = "1" + m1;
                 m2 = "1" + m2;
-
                 m1 = m1.split("");
                 m2 = m2.split("");
 				
-				/** get exponent */
+				// Get exponent
 				var exp1 = getExponent(e1);
 				var exp2 = getExponent(e2);
 
-				//si exp1 > exp2 : positif -> le 2 devra shifter
-				//si exp2 > exp1 : négatif -> le 1 devra shifter
-				//si exp1 = exp2 : 0 -> pas de shift
+				//If exp1 > exp2 : positive -> the n°2 shift
+				//If exp2 > exp1 : négatif -> the n°1 shift
+				//If exp1 = exp2 : 0 -> no shift
 				// Get shift
 				var shift = getShift(parseInt(exp1), parseInt(exp2));
                 var eResult = e1;
@@ -273,7 +280,7 @@
 				if(Math.abs(shift) <= m1.length-1){
                     // Bits1 shift
                     if(shift < 0){
-                        for(var i=0; i<shift; i++) {
+                        for(var i=0; i<Math.abs(shift); i++) {
                             m1.unshift("0");
                             m1.pop();
                         }
@@ -298,14 +305,13 @@
                 var mResult = [];
 				var flag = binaryAdd(m1.reverse(), m2.reverse(), mResult);
                 if(flag == 1) {
+					// Round conditions
                     if (mResult[mResult.length - 1] == "1") {
                         if (mResult[mResult.length - 2] == "1") {
                             mResult.pop();
                             var old_result = mResult;
                             var one = [];
-                            for (var i = 0; i < mResult.length - 1; i++) {
-                                one[i] = "0";
-                            }
+                            for (var i = 0; i < mResult.length - 1; i++) {one[i] = "0";}
                             one[mResult.length - 1] = "1";
                             binaryAdd(old_result.reverse(), one.reverse(), mResult);
                         } else {
@@ -318,6 +324,7 @@
                     mResult.shift();
                 }
 
+				// Exponent
                 eResult = eResult.split("");
                 var a = flag;
                 var quotient = 1;
@@ -331,10 +338,16 @@
                 }
                 var old_result = eResult;
                 binaryAdd(old_result.reverse(), shiftBin, eResult);
+				
+				// Addition Decimal
+				var resultDec = parseFloat(document.getElementById("nbDec1").value) + parseFloat(document.getElementById("nbDec2").value);
+				
+				// Results
+				document.getElementById("resultDec").value = resultDec;
                 document.getElementById("resultBin").value = s1 + eResult.join("") + mResult.join("");
 			}
-			
         }
+		
 		/**
          *  Get shift (difference between two exponents)
          *  @param exp1     : First exponent (int)
@@ -423,6 +436,9 @@
             return result;
         }
 
+		/**
+		 *	Call when page load
+		 */
         function init() {
             resetInput()
             document.getElementById("nbDec1").value = "";
