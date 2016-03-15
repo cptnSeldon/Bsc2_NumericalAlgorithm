@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<br>
     <head>
         <meta charset="utf-8"/>
         <title>Labo 1 - Equipe 4</title>
@@ -18,7 +18,7 @@
             border-bottom: 1px solid black;
         }
     </style>
-    <body onload="init()">
+    <br onload="init()">
     <h2>Labo 1 - Codage flottant</h2>
     <p><label>Nombre de bits <input type="number" name="nbBits" id="nbBits" value="32" min="4" autofocus/></label></p>
     <br/>
@@ -72,6 +72,34 @@
         </tr>
     </table>
     <!-- TABLE END -->
+    <!-- LABEL START -->
+    <h2>Mode d'Emploi</h2>
+    <p>
+        <ul>
+            <li>Choisir le nombre de bits total.</li>
+            <li>Ecrire un nombre dans le champ binaire ou
+                décimal, la conversion se fait automatiquement.</li>
+            <li>Lorsque tous les champs sont remplis, pressez sur
+                la touche [+] pour effectuer l'addition.</li>
+        </ul>
+    </p>
+    <h2>Spécificités</h2>
+    <br>
+        L'application permet de convertir des nombres décimaux flottants en binaire (vice versa)
+        ainsi que de faire des additions. </br>
+        Le calcul de la taille des bits de l'exposant a été déterminé en faisant
+        un graphe des valeurs en utilisant les informations liées à la norme IEEE754.</br>
+        Après avoir récupéré ces valeurs, une courbe de tendance logarithmique est appliquée sur le graphe.</br>
+        Grâce à elle, on a pu établir que la relation entre le nombre total de bits et celui de l'exposant
+        est approximativement de :</br></br><center>3*Log<sub>2</sub>(nombre de bits total) - 7</center> </br>Ainsi, on arrive à minimiser les erreurs qui
+        auraient pu survenir en utilisant un nombre de bits plus aléatoire.</br></br>
+        Le nombre de bits total minimal est de 6 bits, en suivant cette formule.</br>
+        Le nombre de bits total maximal a été fixé à 256 bien qu'à partir d'environ 80 bits il s'ensuit une longue suite
+        composée uniquement de 0.
+        </br></br>
+        On n'a pas réussi à rendre l'addition possible pour les nombres qui ne sont pas du même signe.
+    </p>
+    <!-- LABEL END -->
     <script>
         // *****************************************************************************************
         // Listening inputs
