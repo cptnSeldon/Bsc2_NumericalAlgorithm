@@ -33,6 +33,27 @@
         ctx.beginPath();
         ctx.strokeStyle = '#0000ff';
         ctx.strokeRect(10,10,100,100);
+
+        var xOld=-c.width/2;
+        var yOld=0;
+
+
+        ctx.beginPath();
+        for(var i=c.width/-2;i< c.width/2;i++)
+        {
+
+            ctx.moveTo(xOld,yOld);
+
+            //maj positions
+            yOld=Math.sin(i/10)*200;
+            xOld+=1;
+
+            ctx.lineTo(xOld,yOld);
+
+            ctx.strokeStyle='#000000';
+            ctx.stroke();
+        }
+
     }
 </script>
 </body>
