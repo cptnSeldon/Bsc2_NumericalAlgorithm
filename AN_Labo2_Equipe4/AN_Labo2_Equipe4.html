@@ -19,6 +19,7 @@
 <p><label for="equ1"><input type="radio" name="equation" id="equ1"/>sin(x)-x/13</label></p>
 <p><label for="equ2"><input type="radio" name="equation" id="equ2"/>x/(1-x<sup>2</sup>)</label></p>
 <p><label for="lambda">Lambda (&lambda;) <input type="number" name="lambda" id="lambda" value="1"></label></p>
+<p><label for="min">X</label></p>
 <h3>Graphique</h3>
 <!-- set canvas -->
 <canvas id="myCanvas" width="600px" height="600px">
@@ -71,12 +72,8 @@
         this.scaleX = this.canvas.width / this.rangeX;
         this.scaleY = this.canvas.height / this.rangeY;
 
-        // clear old values and graph
+        // clear old graph
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        Fx = [];
-        Gx = [];
-        Dx = [];
-        racines = [];
 
         //DRAW AXIS X + Y : defined below
         this.drawXAxis();
@@ -247,7 +244,7 @@
      * @param equation
      * @param lambda
      */
-    Graph.prototype.calculate = function(equation, lambda) {
+    /*Graph.prototype.calculate = function(equation, lambda) {
         var i = 0;
         // the maximum round
         while(this.iteration % (1/Math.pow(10, i)) != 0) {
@@ -265,7 +262,10 @@
                 }
             }
         }
-    };
+
+        this.maxX = racines[0];
+        this.minX = racines[racines.length-1];
+    };*/
 
     document.getElementById('equ1').addEventListener('click', function() {
         equationSelected = equation1;
@@ -283,22 +283,61 @@
         displayGraph(equationSelected);
     });
 
+    /**
+     * Affichage des graphiques
+     */
     function displayGraph(equation) {
-        /**
-         * static GRAPH SETTINGS
-         */
+        // clear arrays
+        Fx = [];
+        Gx = [];
+        Dx = [];
+        racines = [];
+
+        var min;
+        var max;
+        calc(equation, parseInt(document.getElementById('lambda').value));
+
+        if (racines.length == 0){
+            min = -100;
+            max = 100;
+        } else if(racines.length == 1) {
+            min = racines[0]-10;
+            max = racines[0]+10;
+        }else {
+            min = Math.round(racines[racines.length - 1]);
+            max = Math.round(racines[0]);
+        }
+
+        var units = (max <= 20) ? 1 : 10;
+
         var myGraph = new Graph({
             canvasId: 'myCanvas',
-            minX: -100,
-            minY: -100,
-            maxX: 100,
-            maxY: 100,
-            unitsPerTick: 10
+            minX: min,
+            minY: min,
+            maxX: max,
+            maxY: max,
+            unitsPerTick: units
         });
-        myGraph.calculate(equation, parseInt(document.getElementById('lambda').value));
         myGraph.drawEquation(Fx, 'red', 1);
         myGraph.drawEquation(Gx, 'blue', 1);
         myGraph.drawEquation(Dx, 'green', 1);
+    }
+
+    function calc (equation, lambda) {
+        var i = 0;
+        // the maximum round
+        for(var x = -100; x <= 100; x += 0.01) {
+            var y = equation(x.toFixed(2));
+            if(isFinite(y)){
+                Dx.unshift([x, x]);
+                Fx.unshift([x, y]);
+                var g = x + lambda * y;
+                Gx.unshift([x,g]);
+                if(Math.round(g*100)/100 == Math.round(x*100)/100){
+                    racines.unshift(Math.round(x*100)/100);
+                }
+            }
+        }
     }
 
     function equation1(x){
