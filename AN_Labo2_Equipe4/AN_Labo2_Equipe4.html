@@ -305,8 +305,8 @@
                 min = racines[0] - 10;
                 max = racines[0] + 10;
             } else {
-                min = Math.round(racines[racines.length - 1]);
-                max = Math.round(racines[0]);
+                max = Math.round(racines[racines.length - 1]);
+                min = Math.round(racines[0]);
             }
 
             var units = (max <= 20) ? 1 : 10;
@@ -325,7 +325,7 @@
 
             if (racines.length != 0) {
                 document.getElementById('racines').innerHTML = "Racines : ";
-                for (var i = racines.length - 1; i >= 0; i--) {
+                for (var i = 0; i < racines.length; i++) {
                     document.getElementById('racines').innerHTML = document.getElementById('racines').innerHTML + racines[i] + ", ";
                 }
             }
@@ -348,12 +348,12 @@
         for(var x = -100; x <= 100; x += 0.01) {
             var y = equation(x.toFixed(2));
             if(isFinite(y)){
-                Dx.unshift([x, x]);
-                Fx.unshift([x, y]);
+                Dx.push([x, x]);
+                Fx.push([x, y]);
                 var g = x + lambda * y;
-                Gx.unshift([x,g]);
+                Gx.push([x,g]);
                 if(Math.round(g*100)/100 == Math.round(x*100)/100){
-                    racines.unshift(Math.round(x*100)/100);
+                    racines.push(Math.round(x*100)/100);
                 }
             }
         }
