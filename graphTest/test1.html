@@ -1,0 +1,262 @@
+<!-- http://www.html5canvastutorials.com/labs/html5-canvas-graphing-an-equation/ -->
+<!DOCTYPE html>
+<html lang="en">
+<!-- HEAD START -->
+<head>
+    <meta charset="UTF-8">
+    <title>Test Canvas</title>
+    <!-- CSS START -->
+    <style>
+        body{
+            margin: 0px;
+            padding: 0px;
+        }
+    </style>
+    <!-- CSS END -->
+</head>
+<!-- HEAD END -->
+    <!-- set canvas -->
+    <canvas id="myCanvas" width="578" height="300"></canvas>
+    <!-- JAVASCRIPT START -->
+    <script>
+        /**
+         * FUNCTION : SET GRAPH
+         * @param config
+         * @constructor
+         */
+        function Graph(config){
+            //USER DEFINED PROPERTIES
+            this.canvas = document.getElementById(config.canvasID);
+                //minima X + Y
+            this.minX = config.minX;
+            this.minY = config.minY;
+                //maxima X + Y
+            this.maxX = config.maxX;
+            this.maxY = config.maxY;
+                //units
+            this.unitsPerTick = config.unitsPerTick;
+
+            //CONSTANTS
+            this.axisColor = '#aaa';
+            this.font = '8pt Calibri';
+            this.tickSize = 20;
+
+            //RELATIONSHIP
+            this.context = this.canvas.getContext('2d');
+                //set range X + Y
+            this.rangeX = this.maxX - this.minX;
+            this.rangeY = this.maxY - this.minY;
+                //set units on graph X + Y
+            this.unitX = this.canvas.width / this.rangeX;
+            this.unitY = this.canvas.height / this.rangeY;
+                //set center X + Y
+            this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.canvas.width);
+            this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
+                //set iteration X
+            this.iteration = (this.maxX - this.minX) / 1000;
+                //set scale X + Y
+            this.scaleX = this.canvas.width / this.rangeX;
+            this.scaleY = this.canvas.height / this.rangeY;
+
+            //DRAW AXIS X + Y : defined below
+            this.drawXAxis();
+            this.drawYAxis();
+        }
+
+        /**
+         * FUNCTION : DRAW X-AXIS
+         */
+        Graph.prototype.drawXAxis = function(){
+            //RETRIEVE CONTEXT
+            var context = this.context;
+                //context settings
+            context.save();
+            context.beginPath();
+                //move to Y-center : draw X-axis
+            context.moveTo(0, this.centerY)
+            context.lineTo(this.canvas.width, this.centerY);
+                //set style
+            context.strokeStyle = this.axisColor;
+            context.lineWidth = 2;
+            context.stroke();
+
+            //DRAW TICK MARKS
+            var xPosIncrement = this.unitsPerTick * this.unitX;
+            var xPos, unit;
+                //text settings
+            context.font = this.font;
+            context.textAlign = 'center';
+            context.textBaseline = 'top';
+
+            //DRAW LEFT TICK MARKS
+            xPos = this.centerX - xPosIncrement;
+            unit = -1 * this.unitsPerTick;
+                //while X-position greater than 0
+            while(xPos > 0){
+                //draw ticks + unit
+                context.moveTo(xPos, this.centerY - this.tickSize / 2);
+                context.lineTo(xPos, this.centerY + this.tickSize / 2);
+                context.stroke();
+                context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
+                //change X-position + unit value
+                unit -= this.unitsPerTick;
+                xPos = Math.round(xPos - xPosIncrement);
+            }
+
+            //DRAW RIGHT TICK MARKS
+            xPos = this.centerX + xPosIncrement;
+            unit = this.unitsPerTick;
+            //while X-position smaller than canvas width
+            while(xPos < this.canvas.width){
+                ///draw ticks + unit
+                context.moveTo(xPos, this.centerY - this.tickSize / 2);
+                context.lineTo(xPos, this.centerY + this.tickSize / 2);
+                context.stroke();
+                context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
+                //change X-position + unit value
+                unit += this.unitsPerTick;
+                xPos = Math.round(xPos + xPosIncrement);
+            }
+            context.restore();
+        };
+
+        /**
+         * FUNCTION : DRAW Y-AXIS
+         */
+        Graph.prototype.drawYAxis = function(){
+            //SET CONTEXT
+            var context = this.context;
+            //context settings
+            context.save();
+            context.beginPath();
+            //move to Y-center : draw X-axis
+            context.moveTo(this.centerX, 0);
+            context.lineTo(this.centerX, this.canvas.height);
+            //set style
+            context.strokeStyle = this.axisColor;
+            context.lineWidth = 2;
+            context.stroke();
+
+            //DRAW TICK MARKS
+            var yPosIncrement = this.unitsPerTick * this.unitY;
+            var yPos, unit;
+            //text settings
+            context.font = this.font;
+            context.textAlign = 'right';
+            context.textBaseline = 'middle';
+
+            //DRAW TOP TICK MARKS
+            yPos = this.centerY - yPosIncrement;
+            unit = this.unitsPerTick;
+            //while Y-position greater than 0
+            while(yPos > 0){
+                //draw ticks + unit
+                context.moveTo(this.centerX - this.tickSize / 2, yPos);
+                context.lineTo(this.centerX + this.tickSize / 2, yPos);
+                context.stroke();
+                context.fillText(unit, this.centerX - this.tickSize / 2 - 3, yPos);
+                //change Y-position + unit value
+                unit += this.unitsPerTick;
+                yPos = Math.round(yPos - yPosIncrement);
+            }
+
+            //DRAW BOTTOM TICK MARKS
+            yPos = this.centerY + yPosIncrement;
+            unit = -1 * this.unitsPerTick;
+            //while Y-position smaller than canvas HEIGHT
+            while(yPos < this.canvas.height){
+                //draw ticks + unit
+                context.moveTo(this.centerX - this.tickSize / 2, yPos);
+                context.lineTo(this.centerX + this.tickSize / 2, yPos);
+                context.stroke();
+                context.fillText(unit, this.centerX + this.tickSize / 2 - 3, yPos);
+                //change Y-position + unit value
+                unit -= this.unitsPerTick;
+                yPos = Math.round(yPos + yPosIncrement);
+            }
+            context.restore();
+        };
+
+        /**
+         * FUNCTION : DRAW EQUATION
+         * @param equation
+         * @param color
+         * @param thickness
+         */
+        Graph.prototype.drawEquation = function(equation, color, thickness){
+            //RETRIEVE CONTEXT
+            var context = this.context;
+            context.save();
+            context.save();
+                //translation + scaling
+            this.transformContext();
+
+            //CONTEXT SETTINGS : needed for drawing purposes
+            context.beginPath();
+            context.moveTo(this.minX, equation(this.minX));
+
+            //DRAW LINE : iteration by iteration
+            for(var x = this.minX + this.iteration; x <= this.maxX; x+= this.iteration){
+                context.lineTo(x, equation(x));
+            }
+
+            //LINE SETTINGS
+            context.restore();
+            context.lineJoin = 'round';
+            context.lineWidth = thickness;
+            context.strokeStyle = color;
+            context.stroke();
+            context.restore();
+        };
+
+        /**
+         * FUNCTION : TRANSFORM CONTEXT - translation + scaling
+         */
+        Graph.prototype.transformContext = function(){
+            //RETRIEVE CONTEXT
+            var context = this.context;
+
+            //MOVE CONTEXT TO CENTER OF CANVAS
+            this.context.translate(this.centerX, this.centerY);
+
+            // * stretch grid to fit the canvas window, and invert
+            // * the y-scale so that it will increment as moving
+            // * upwards
+            context.scale(this.scaleX, -this.scaleY);
+        };
+
+        /**
+         * static GRAPH SETTINGS
+         * */
+        var myGraph = new Graph({
+            canvasID: 'myCanvas',
+            minX: -10,
+            minY: -10,
+            maxX: 10,
+            maxY: 10,
+            unitsPerTick: 1
+        });
+
+        /**
+         * static test EQUATIONS
+         * */
+
+        myGraph.drawEquation(function(x){
+            return 5 * Math.sin(x);
+        }, 'green', 3);
+
+        myGraph.drawEquation(function(x) {
+            return x * x;
+        }, 'blue', 3);
+
+        myGraph.drawEquation(function(x) {
+            return 1 * x;
+        }, 'red', 3);
+    </script>
+    <!-- JAVASCRIPT END -->
+<!-- BODY START -->
+<body>
+
+</body>
+<!-- BODY END -->
+</html>
