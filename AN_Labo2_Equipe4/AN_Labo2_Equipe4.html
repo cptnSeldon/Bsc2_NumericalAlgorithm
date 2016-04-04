@@ -20,9 +20,14 @@
     Votre navigateur ne supporte pas les canevas (HTML5)
 </canvas>
 <script>
+    var c = document.getElementById("graphe");
+    var ctx = c.getContext("2d");
+    // var tabEquations = [equation1, equation2];
+    var Fx = []; 		// Tableau valeurs de F[x]
+    var Gx = [];		// Tableau valeurs de G[x]
+    var racines = [];	// Tableau valeures des racines
+	
     function test() {
-        var c = document.getElementById("graphe");
-        var ctx = c.getContext("2d");
         ctx.transform(1, 0, 0, -1, c.width/2, c.height/2);
         ctx.beginPath();
         ctx.moveTo(-c.width/2, 0);
@@ -54,6 +59,31 @@
             ctx.stroke();
         }
 
+    }
+	
+	function fixedPoint() {
+        var l = 1;
+        var dx = 0.01;
+        for(var x=-5; x<=5;x+=dx){
+            x = Math.round(x*100)/100;
+            var y = Math.round(equation1(x)*100)/100;
+            Fx.unshift(y);
+            var g = Math.round((x+l*y)*100)/100;
+            Gx.unshift(g);
+            if(g == x) {
+                racines.unshift(x);
+            }
+        }
+    }
+
+    function equation1(x){
+        return (Math.sin(x)-x/13);
+    }
+
+    function equation2(x){
+        if(Math.pow(2, x) != 1)
+            return (x/(1-Math.pow(2,x)));
+        return 0;
     }
 </script>
 </body>
