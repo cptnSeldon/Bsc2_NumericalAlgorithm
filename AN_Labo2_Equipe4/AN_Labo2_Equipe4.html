@@ -1,90 +1,317 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- http://www.html5canvastutorials.com/labs/html5-canvas-graphing-an-equation/ -->
+<!DOCTYPE HTML>
+<html lang="fr">
+<!-- HEAD START -->
 <head>
     <meta charset="UTF-8">
     <title>Labo 2 | Equipe 4</title>
+    <!-- CSS START -->
     <style>
-        #graphe {
-            /*border: 1px solid black;*/
-            background-color: #ecf0f1;
-        }
+        body { margin: 5px; padding: 0px; font-family: 'Calibri', sans-serif;}
+        #myCanvas { background-color: #ecf0f1; }
     </style>
+    <!-- CSS END -->
 </head>
-<body onload="test()">
+<!-- HEAD END -->
+<!-- BODY START -->
+<body>
 <h2>Résolution d'équations</h2>
-<p><label for="lambda">Lambda <input type="number" name="lambda" id="lambda"/></label></p>
 <p><label for="equ1"><input type="radio" name="equation" id="equ1"/>sin(x)-x/13</label></p>
-<p><label for="equ2"><input type="radio" name="equation" id="equ2"/>x/1-x<sup>2</sup></sub></label></p>
+<p><label for="equ2"><input type="radio" name="equation" id="equ2"/>x/(1-x<sup>2</sup>)</label></p>
+<p><label for="lambda">Lambda (&lambda;) <input type="number" name="lambda" id="lambda" value="1"></label></p>
 <h3>Graphique</h3>
-<canvas id="graphe" width="500px" height="500px">
+<!-- set canvas -->
+<canvas id="myCanvas" width="600px" height="600px">
     Votre navigateur ne supporte pas les canevas (HTML5)
 </canvas>
+<p>
+    <span style="color: red;">f(x)</span> //
+    <span style="color: green;">y = x</span> //
+    <span style="color: blue;">g(x) = x + &lambda; f(x)</span>
+</p>
+<!-- JAVASCRIPT START -->
 <script>
-    var c = document.getElementById("graphe");
-    var ctx = c.getContext("2d");
-    // var tabEquations = [equation1, equation2];
-    var Fx = []; 		// Tableau valeurs de F[x]
-    var Gx = [];		// Tableau valeurs de G[x]
-    var racines = [];	// Tableau valeures des racines
-	
-    function test() {
-        ctx.transform(1, 0, 0, -1, c.width/2, c.height/2);
-        ctx.beginPath();
-        ctx.moveTo(-c.width/2, 0);
-        ctx.lineTo(c.width/2, 0);
-        ctx.moveTo(0, c.height/2);
-        ctx.lineTo(0, -c.height/2);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.strokeStyle = '#0000ff';
-        ctx.strokeRect(10,10,100,100);
+    var Fx = [];
+    var Gx = [];
+    var Dx = [];
+    var racines = [];
+    var equationSelected;
 
-        var xOld=-c.width/2;
-        var yOld=0;
+    function Graph(config) {
+        // USER DEFINED PROPERTIES
+        this.canvas = document.getElementById(config.canvasId);
+        // minima X + Y
+        this.minX = config.minX;
+        this.minY = config.minY;
+        // maxima X + Y
+        this.maxX = config.maxX;
+        this.maxY = config.maxY;
+        // units
+        this.unitsPerTick = config.unitsPerTick;
 
+        // CONSTANTS
+        this.axisColor = '#aaa';
+        this.font = '8pt Calibri';
+        this.tickSize = 10;
 
-        ctx.beginPath();
-        for(var i=c.width/-2;i< c.width/2;i++)
-        {
+        // RELATIONSHIP
+        this.context = this.canvas.getContext('2d');
+        // set range X + Y
+        this.rangeX = this.maxX - this.minX;
+        this.rangeY = this.maxY - this.minY;
+        // set units on graph X + Y
+        this.unitX = this.canvas.width / this.rangeX;
+        this.unitY = this.canvas.height / this.rangeY;
+        // set center X + Y
+        this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
+        this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.canvas.width);
+        // set iteration X
+        this.iteration = (this.maxX - this.minX) / 1000;
+        // set scale X + Y
+        this.scaleX = this.canvas.width / this.rangeX;
+        this.scaleY = this.canvas.height / this.rangeY;
 
-            ctx.moveTo(xOld,yOld);
+        // clear old values and graph
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        Fx = [];
+        Gx = [];
+        Dx = [];
+        racines = [];
 
-            //maj positions
-            yOld=Math.sin(i/10)*200;
-            xOld+=1;
+        //DRAW AXIS X + Y : defined below
+        this.drawXAxis();
+        this.drawYAxis();
+    }
+    /**
+     * FUNCTION : DRAW X-AXIS
+     */
+    Graph.prototype.drawXAxis = function() {
+        // RETRIEVE CONTEXT
+        var context = this.context;
+        // context settings
+        context.save();
+        context.beginPath();
+        // move to Y-center : draw X-axis
+        context.moveTo(0, this.centerY);
+        context.lineTo(this.canvas.width, this.centerY);
+        // set style
+        context.strokeStyle = this.axisColor;
+        context.lineWidth = 1;
+        context.stroke();
 
-            ctx.lineTo(xOld,yOld);
+        // DRAW TICK MARKS
+        var xPosIncrement = this.unitsPerTick * this.unitX;
+        var xPos, unit;
+        // text settings
+        context.font = this.font;
+        context.textAlign = 'center';
+        context.textBaseline = 'top';
 
-            ctx.strokeStyle='#000000';
-            ctx.stroke();
+        // DRAW LEFT TICK MARKS
+        xPos = this.centerX - xPosIncrement;
+        unit = -1 * this.unitsPerTick;
+        //while X-position greater than 0
+        while(xPos > 0){
+            // draw ticks + unit
+            context.moveTo(xPos, this.centerY - this.tickSize / 2);
+            context.lineTo(xPos, this.centerY + this.tickSize / 2);
+            context.stroke();
+            context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
+            // change X-position + unit value
+            unit -= this.unitsPerTick;
+            xPos = Math.round(xPos - xPosIncrement);
         }
 
-    }
-	
-	function fixedPoint() {
-        var l = 1;
-        var dx = 0.01;
-        for(var x=-5; x<=5;x+=dx){
-            x = Math.round(x*100)/100;
-            var y = Math.round(equation1(x)*100)/100;
-            Fx.unshift(y);
-            var g = Math.round((x+l*y)*100)/100;
-            Gx.unshift(g);
-            if(g == x) {
-                racines.unshift(x);
+        // DRAW RIGHT TICK MARKS
+        xPos = this.centerX + xPosIncrement;
+        unit = this.unitsPerTick;
+        // while X-position smaller than canvas width
+        while(xPos < this.canvas.width){
+            // draw ticks + unit
+            context.moveTo(xPos, this.centerY - this.tickSize / 2);
+            context.lineTo(xPos, this.centerY + this.tickSize / 2);
+            context.stroke();
+            context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
+            // change X-position + unit value
+            unit += this.unitsPerTick;
+            xPos = Math.round(xPos + xPosIncrement);
+        }
+        context.restore();
+    };
+    /**
+     * FUNCTION : DRAW Y-AXIS
+     */
+    Graph.prototype.drawYAxis = function(){
+        // SET CONTEXT
+        var context = this.context;
+        // context settings
+        context.save();
+        context.beginPath();
+        // move to Y-center : draw X-axis
+        context.moveTo(this.centerX, 0);
+        context.lineTo(this.centerX, this.canvas.height);
+        // set style
+        context.strokeStyle = this.axisColor;
+        context.lineWidth = 2;
+        context.stroke();
+
+        // DRAW TICK MARKS
+        var yPosIncrement = this.unitsPerTick * this.unitY;
+        var yPos, unit;
+        // text settings
+        context.font = this.font;
+        context.textAlign = 'right';
+        context.textBaseline = 'middle';
+
+        // DRAW TOP TICK MARKS
+        yPos = this.centerY - yPosIncrement;
+        unit = this.unitsPerTick;
+        // while Y-position greater than 0
+        while(yPos > 0){
+            // draw ticks + unit
+            context.moveTo(this.centerX - this.tickSize / 2, yPos);
+            context.lineTo(this.centerX + this.tickSize / 2, yPos);
+            context.stroke();
+            context.fillText(unit, this.centerX - this.tickSize / 2 - 3, yPos);
+            // change Y-position + unit value
+            unit += this.unitsPerTick;
+            yPos = Math.round(yPos - yPosIncrement);
+        }
+
+        // DRAW BOTTOM TICK MARKS
+        yPos = this.centerY + yPosIncrement;
+        unit = -1 * this.unitsPerTick;
+        // while Y-position smaller than canvas HEIGHT
+        while(yPos < this.canvas.height){
+            // draw ticks + unit
+            context.moveTo(this.centerX - this.tickSize / 2, yPos);
+            context.lineTo(this.centerX + this.tickSize / 2, yPos);
+            context.stroke();
+            context.fillText(unit, this.centerX + this.tickSize / 2 - 3, yPos);
+            // change Y-position + unit value
+            unit -= this.unitsPerTick;
+            yPos = Math.round(yPos + yPosIncrement);
+        }
+        context.restore();
+    };
+    /**
+     * FUNCTION : DRAW EQUATION
+     * @param Yx : Array of points
+     * @param color
+     * @param thickness
+     */
+    Graph.prototype.drawEquation = function(Yx, color, thickness) {
+        // RETRIEVE CONTEXT
+        var context = this.context;
+        context.save();
+        context.save();
+        // translation + scaling
+        this.transformContext();
+
+        // CONTEXT SETTINGS : needed for drawing purposes
+        context.beginPath();
+        context.moveTo(Yx[0][0], Yx[0][1]);
+
+        // DRAW LINE : iteration by iteration
+        for(var i = 1; i < Yx.length; i++) {
+            context.lineTo(Yx[i][0], Yx[i][1]);
+        }
+
+        // LINE SETTINGS
+        context.restore();
+        context.lineJoin = 'round';
+        context.lineWidth = thickness;
+        context.strokeStyle = color;
+        context.stroke();
+        context.restore();
+    };
+
+    /**
+     * FUNCTION : TRANSFORM CONTEXT - translation + scaling
+     */
+    Graph.prototype.transformContext = function(){
+        //RETRIEVE CONTEXT
+        var context = this.context;
+
+        //MOVE CONTEXT TO CENTER OF CANVAS
+        this.context.translate(this.centerX, this.centerY);
+
+        // * stretch grid to fit the canvas window, and invert
+        // * the y-scale so that it will increment as moving
+        // * upwards
+        context.scale(this.scaleX, -this.scaleY);
+    };
+
+    /**
+     * Calculate the coordinates of each points
+     * @param equation
+     * @param lambda
+     */
+    Graph.prototype.calculate = function(equation, lambda) {
+        var i = 0;
+        // the maximum round
+        while(this.iteration % (1/Math.pow(10, i)) != 0) {
+            i++;
+        }
+        for(var x = this.minX + this.iteration; x <= this.maxX; x += this.iteration) {
+            var y = equation(x.toFixed(4));
+            if(isFinite(y)){
+                Dx.unshift([x, x]);
+                Fx.unshift([x, y]);
+                var g = x + lambda * y;
+                Gx.unshift([x,g]);
+                if(Math.round(g*Math.pow(10, i))/Math.pow(10,i) == Math.round(x*Math.pow(10,i))/Math.pow(10,i)){
+                    racines.unshift(Math.round(x*Math.pow(10,i))/Math.pow(10,i));
+                }
             }
         }
+    };
+
+    document.getElementById('equ1').addEventListener('click', function() {
+        equationSelected = equation1;
+        displayGraph(equationSelected);
+        alert(racines);
+    });
+
+    document.getElementById('equ2').addEventListener('click', function() {
+        equationSelected = equation2;
+        displayGraph(equationSelected);
+        alert(racines);
+    });
+
+    document.getElementById('lambda').addEventListener('change', function() {
+        displayGraph(equationSelected);
+    });
+
+    function displayGraph(equation) {
+        /**
+         * static GRAPH SETTINGS
+         */
+        var myGraph = new Graph({
+            canvasId: 'myCanvas',
+            minX: -100,
+            minY: -100,
+            maxX: 100,
+            maxY: 100,
+            unitsPerTick: 10
+        });
+        myGraph.calculate(equation, parseInt(document.getElementById('lambda').value));
+        myGraph.drawEquation(Fx, 'red', 1);
+        myGraph.drawEquation(Gx, 'blue', 1);
+        myGraph.drawEquation(Dx, 'green', 1);
     }
 
     function equation1(x){
-        return (Math.sin(x)-x/13);
+        return Math.sin(x)-x/13;
     }
 
-    function equation2(x){
-        if(Math.pow(2, x) != 1)
-            return (x/(1-Math.pow(2,x)));
-        return 0;
+    function equation2(x) {
+        return x/(1-Math.pow(x, 2));
     }
+
+
 </script>
+<!-- JAVASCRIPT END -->
 </body>
+<!-- BODY END -->
 </html>
