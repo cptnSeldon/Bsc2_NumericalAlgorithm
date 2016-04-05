@@ -42,8 +42,6 @@
     var Gx = [];
     var Dx = [];
     var racines = [];
-    /*test pour l'escalier*/
-    var racinesTest=[];
     var equationSelected;
 
     function Graph(config) {
@@ -229,7 +227,9 @@
         context.stroke();
         context.restore();
     };
-    /**TESTSTSETTSETSE**/
+	/** 
+	 * Draw stairs
+	 */
     Graph.prototype.drawPath= function(equation){
         var xo=document.getElementById('XE').value;
         var context=this.context;
@@ -238,16 +238,12 @@
 
         this.transformContext();
         var lamb=document.getElementById('lambda').value;
-//        alert(lamb);
         context.beginPath();
         var tmpx=parseFloat(xo);
-        var tmpy=lamb*(equation(tmpx))+tmpx;//sinus
-//        var lastRoot=racineTest.pop();
+        var tmpy=lamb*(equation(tmpx))+tmpx;
 
         context.moveTo(tmpx,tmpy);
 
-//        alert('tmpy='+tmpy+' tmpx='+tmpx);
-//        alert('eq='+lamb*equation1(xo));
         var count=0;
         if(tmpy>=tmpx)
         {
@@ -258,7 +254,6 @@
                 tmpx=tmpy;
                 tmpy=lamb*equation(tmpx)+tmpx;
                 context.lineTo(tmpx,tmpy);
-//            racinesTest.push(tmpx);
             }
             if(count>40)
             {
@@ -269,12 +264,10 @@
             {
                 document.getElementById('testRac').innerHTML = tmpx+'='+tmpy;
             }
-//            alert('iterations:'+count);
         }
         else
         {
             alert('choisire borne plus grande que '+xo+'!');
-//            document.getElementById('testRac').innerHTML = lastRoot;
         }
 
         context.restore();
@@ -285,10 +278,6 @@
 
         context.stroke();
         context.restore();
-
-
-        //Gx[1][0] =2eme x
-        //Gx[1][1]=2eme y
 
     };
     /**
@@ -307,44 +296,17 @@
         context.scale(this.scaleX, -this.scaleY);
     };
 
-
-    /**
-     * Calculate the coordinates of each points
-     * @param equation
-     * @param lambda
-     */
-    /*Graph.prototype.calculate = function(equation, lambda) {
-        var i = 0;
-        // the maximum round
-        while(this.iteration % (1/Math.pow(10, i)) != 0) {
-            i++;
-        }
-        for(var x = this.minX + this.iteration; x <= this.maxX; x += this.iteration) {
-            var y = equation(x.toFixed(4));
-            if(isFinite(y)){
-                Dx.unshift([x, x]);
-                Fx.unshift([x, y]);
-                var g = x + lambda * y;
-                Gx.unshift([x,g]);
-                if(Math.round(g*Math.pow(10, i))/Math.pow(10,i) == Math.round(x*Math.pow(10,i))/Math.pow(10,i)){
-                    racines.unshift(Math.round(x*Math.pow(10,i))/Math.pow(10,i));
-                }
-            }
-        }
-
-        this.maxX = racines[0];
-        this.minX = racines[racines.length-1];
-    };*/
-
     document.getElementById('equ1').addEventListener('click', function() {
         equationSelected = equation1;
         displayGraph(equationSelected);
+        document.getElementById('testRac').innerHTML="";
 
     });
 
     document.getElementById('equ2').addEventListener('click', function() {
         equationSelected = equation2;
         displayGraph(equationSelected);
+        document.getElementById('testRac').innerHTML="";
     });
 
     document.getElementById('lambda').addEventListener('change', function() {
@@ -365,8 +327,6 @@
         Gx = [];
         Dx = [];
         racines = [];
-        /*test pour escalier*/
-        racinesTest=[];
         var min;
         var max;
         var lambda = parseInt(document.getElementById('lambda').value)
