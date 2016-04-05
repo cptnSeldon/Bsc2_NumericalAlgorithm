@@ -18,8 +18,7 @@
 <h2>Résolution d'équations</h2>
 <p><label for="equ1"><input type="radio" name="equation" id="equ1"/>sin(x)-x/13</label></p>
 <p><label for="equ2"><input type="radio" name="equation" id="equ2"/>x/(1-x<sup>2</sup>)</label></p>
-<p><label for="lambda">Lambda (&lambda;) <input type="number" name="lambda" id="lambda" value="1"></label></p>
-<p><label for="min">X</label></p>
+<p><label for="lambda">Lambda (&lambda;) <input type="number" name="lambda" id="lambda" value="1"/></label></p>
 <h3>Graphique</h3>
 <p id="racines"></p>
 <!-- set canvas -->
@@ -240,34 +239,6 @@
         context.scale(this.scaleX, -this.scaleY);
     };
 
-    /**
-     * Calculate the coordinates of each points
-     * @param equation
-     * @param lambda
-     */
-    /*Graph.prototype.calculate = function(equation, lambda) {
-        var i = 0;
-        // the maximum round
-        while(this.iteration % (1/Math.pow(10, i)) != 0) {
-            i++;
-        }
-        for(var x = this.minX + this.iteration; x <= this.maxX; x += this.iteration) {
-            var y = equation(x.toFixed(4));
-            if(isFinite(y)){
-                Dx.unshift([x, x]);
-                Fx.unshift([x, y]);
-                var g = x + lambda * y;
-                Gx.unshift([x,g]);
-                if(Math.round(g*Math.pow(10, i))/Math.pow(10,i) == Math.round(x*Math.pow(10,i))/Math.pow(10,i)){
-                    racines.unshift(Math.round(x*Math.pow(10,i))/Math.pow(10,i));
-                }
-            }
-        }
-
-        this.maxX = racines[0];
-        this.minX = racines[racines.length-1];
-    };*/
-
     document.getElementById('equ1').addEventListener('click', function() {
         equationSelected = equation1;
         displayGraph(equationSelected);
@@ -326,7 +297,7 @@
             if (racines.length != 0) {
                 document.getElementById('racines').innerHTML = "Racines : ";
                 for (var i = 0; i < racines.length; i++) {
-                    document.getElementById('racines').innerHTML = document.getElementById('racines').innerHTML + racines[i] + ", ";
+                    document.getElementById('racines').innerHTML = document.getElementById('racines').innerHTML + racines[i] + " | ";
                 }
             }
         }
