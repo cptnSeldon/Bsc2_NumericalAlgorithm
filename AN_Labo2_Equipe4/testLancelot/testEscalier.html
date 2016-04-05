@@ -24,7 +24,7 @@
     <label>Valeurs trouvées (X=Y)</label>
     <label id="testRac">racine</label>
 </p>
-<p><label for="XE">position pour l'escalier:<input type="number" name="xEscalier" id="XE" value="0"></label></p>
+<p><label for="XE">position pour l'escalier:<input type="number" name="xEscalier" id="XE" value="0" step="0.01"></label></p>
 <h3>Graphique</h3>
 <p id="racines"></p>
 <!-- set canvas -->
@@ -240,7 +240,7 @@
         var lamb=document.getElementById('lambda').value;
 //        alert(lamb);
         context.beginPath();
-        var tmpx=parseInt(xo);
+        var tmpx=parseFloat(xo);
         var tmpy=lamb*(equation(tmpx))+tmpx;//sinus
 //        var lastRoot=racineTest.pop();
 
@@ -251,7 +251,7 @@
         var count=0;
         if(tmpy>=tmpx)
         {
-            while(tmpx!=tmpy && count<20)
+            while(tmpx!=tmpy && count<=40)
             {
                 count++;
                 context.lineTo(tmpy,tmpy);
@@ -260,16 +260,16 @@
                 context.lineTo(tmpx,tmpy);
 //            racinesTest.push(tmpx);
             }
-            if(count>20)
+            if(count>40)
             {
-                alert('choisissez une autre valeur que '+xo);
+                alert('choisissez une autre valeur que '+xo+'('+count+'iterations)');
+
             }
             else
             {
                 document.getElementById('testRac').innerHTML = tmpx+'='+tmpy;
             }
-
-
+//            alert('iterations:'+count);
         }
         else
         {
