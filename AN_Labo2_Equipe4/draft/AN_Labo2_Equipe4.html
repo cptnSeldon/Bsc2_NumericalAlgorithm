@@ -1,4 +1,4 @@
-﻿<!-- http://www.html5canvastutorials.com/labs/html5-canvas-graphing-an-equation/ -->
+<!-- http://www.html5canvastutorials.com/labs/html5-canvas-graphing-an-equation/ -->
 <!DOCTYPE HTML>
 <html lang="fr">
 <!-- HEAD START -->
@@ -18,23 +18,7 @@
 <h2>Résolution d'équations</h2>
 <p><label for="equ1"><input type="radio" name="equation" id="equ1"/>sin(x)-x/13</label></p>
 <p><label for="equ2"><input type="radio" name="equation" id="equ2"/>x/(1-x<sup>2</sup>)</label></p>
-<p><label for="lambda">Lambda (&lambda;) <input type="number" name="lambda" id="lambda" value="1"></label></p>
-<!--<p><label for="min">X</label></p>-->
-<p>
-    <label>Valeurs trouvées (X=Y)</label>
-    <label id="testRac">racine</label>
-</p>
-<p><label for="XE">position pour l'escalier:<input type="number" name="xEscalier" id="XE" value="0" step="0.01"></label></p>
-<h3>Guide d'utilisation</h3>
-<p>
-    Cette application permet de trouver les racines des fonctions ci-dessus à l'aide de la technique
-    du point fixe. Il faut commencer par choisir une fonction à afficher, la valeur du lambda, (la racine s'affiche en dessous),
-    après on peut choisir la position de l'escalier (s'il y a un dépassement, une alerte s'affiche pour demander à l'utilisateur
-    de le changer. Sinon, elle tourne à l'infini -> divergence).
-</p>
-<p>
-    <b>Référence</b> : http://www.html5canvastutorials.com/labs/html5-canvas-graphing-an-equation/
-</p>
+<p><label for="lambda">Lambda (&lambda;) <input type="number" name="lambda" id="lambda" value="1"/></label></p>
 <h3>Graphique</h3>
 <p id="racines"></p>
 <!-- set canvas -->
@@ -48,53 +32,47 @@
 </p>
 <!-- JAVASCRIPT START -->
 <script>
-    //GLOBALS : declaration
-    ///Fx -> actual function / Gx -> x+lambda*Fx / Dx -> x = y
     var Fx = [];
     var Gx = [];
     var Dx = [];
-    ///roots array
-    var roots = [];
+    var racines = [];
     var equationSelected;
 
-    /**
-     * FUNCTION : GRAPH -> default properties
-     */
     function Graph(config) {
-        //USER DEFINED PROPERTIES
+        // USER DEFINED PROPERTIES
         this.canvas = document.getElementById(config.canvasId);
-        ///minima X + Y
+        // minima X + Y
         this.minX = config.minX;
         this.minY = config.minY;
-        ///maxima X + Y
+        // maxima X + Y
         this.maxX = config.maxX;
         this.maxY = config.maxY;
-        ///units
+        // units
         this.unitsPerTick = config.unitsPerTick;
 
-        //CONSTANTS
+        // CONSTANTS
         this.axisColor = '#aaa';
         this.font = '8pt Calibri';
         this.tickSize = 10;
 
-        //RELATIONSHIP
+        // RELATIONSHIP
         this.context = this.canvas.getContext('2d');
-        ///set range X + Y
+        // set range X + Y
         this.rangeX = this.maxX - this.minX;
         this.rangeY = this.maxY - this.minY;
-        ///set units on graph X + Y
+        // set units on graph X + Y
         this.unitX = this.canvas.width / this.rangeX;
         this.unitY = this.canvas.height / this.rangeY;
-        ///set center X + Y
+        // set center X + Y
         this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
         this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.canvas.width);
-        ///set iteration X
+        // set iteration X
         this.iteration = (this.maxX - this.minX) / 1000;
-        ///set scale X + Y
+        // set scale X + Y
         this.scaleX = this.canvas.width / this.rangeX;
         this.scaleY = this.canvas.height / this.rangeY;
 
-        ///clear old graph
+        // clear old graph
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         //DRAW AXIS X + Y : defined below
@@ -105,116 +83,112 @@
      * FUNCTION : DRAW X-AXIS
      */
     Graph.prototype.drawXAxis = function() {
-        //RETRIEVE CONTEXT
+        // RETRIEVE CONTEXT
         var context = this.context;
-        ///context settings
-        ////push to stack
+        // context settings
         context.save();
         context.beginPath();
-        ///move to Y-center : draw X-axis
+        // move to Y-center : draw X-axis
         context.moveTo(0, this.centerY);
         context.lineTo(this.canvas.width, this.centerY);
-        ///set style
+        // set style
         context.strokeStyle = this.axisColor;
         context.lineWidth = 1;
         context.stroke();
 
-        //DRAW TICK MARKS
+        // DRAW TICK MARKS
         var xPosIncrement = this.unitsPerTick * this.unitX;
         var xPos, unit;
-        ///text settings
+        // text settings
         context.font = this.font;
         context.textAlign = 'center';
         context.textBaseline = 'top';
 
-        //DRAW LEFT TICK MARKS
+        // DRAW LEFT TICK MARKS
         xPos = this.centerX - xPosIncrement;
         unit = -1 * this.unitsPerTick;
-        ///while X-position greater than 0
+        //while X-position greater than 0
         while(xPos > 0){
-            ////draw ticks + unit
+            // draw ticks + unit
             context.moveTo(xPos, this.centerY - this.tickSize / 2);
             context.lineTo(xPos, this.centerY + this.tickSize / 2);
             context.stroke();
             context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
-            ////change X-position + unit value
+            // change X-position + unit value
             unit -= this.unitsPerTick;
             xPos = Math.round(xPos - xPosIncrement);
         }
 
-        //DRAW RIGHT TICK MARKS
+        // DRAW RIGHT TICK MARKS
         xPos = this.centerX + xPosIncrement;
         unit = this.unitsPerTick;
-        ///while X-position smaller than canvas width
+        // while X-position smaller than canvas width
         while(xPos < this.canvas.width){
-            ///draw ticks + unit
+            // draw ticks + unit
             context.moveTo(xPos, this.centerY - this.tickSize / 2);
             context.lineTo(xPos, this.centerY + this.tickSize / 2);
             context.stroke();
             context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
-            ////change X-position + unit value
+            // change X-position + unit value
             unit += this.unitsPerTick;
             xPos = Math.round(xPos + xPosIncrement);
         }
-        ////pull from stack
         context.restore();
     };
     /**
      * FUNCTION : DRAW Y-AXIS
      */
     Graph.prototype.drawYAxis = function(){
-        //RETRIEVE CONTEXT
+        // SET CONTEXT
         var context = this.context;
-        ///context settings
-        ////push to stack
+        // context settings
         context.save();
         context.beginPath();
-        ///move to Y-center : draw X-axis
+        // move to Y-center : draw X-axis
         context.moveTo(this.centerX, 0);
         context.lineTo(this.centerX, this.canvas.height);
-        ///set style
+        // set style
         context.strokeStyle = this.axisColor;
         context.lineWidth = 2;
         context.stroke();
 
-        //DRAW TICK MARKS
+        // DRAW TICK MARKS
         var yPosIncrement = this.unitsPerTick * this.unitY;
         var yPos, unit;
-        ///text settings
+        // text settings
         context.font = this.font;
         context.textAlign = 'right';
         context.textBaseline = 'middle';
 
-        //DRAW TOP TICK MARKS
+        // DRAW TOP TICK MARKS
         yPos = this.centerY - yPosIncrement;
         unit = this.unitsPerTick;
-        ///while Y-position greater than 0
+        // while Y-position greater than 0
         while(yPos > 0){
-            ////draw ticks + unit
+            // draw ticks + unit
             context.moveTo(this.centerX - this.tickSize / 2, yPos);
             context.lineTo(this.centerX + this.tickSize / 2, yPos);
             context.stroke();
             context.fillText(unit, this.centerX - this.tickSize / 2 - 3, yPos);
-            ////change Y-position + unit value
+            // change Y-position + unit value
             unit += this.unitsPerTick;
             yPos = Math.round(yPos - yPosIncrement);
         }
 
-        //DRAW BOTTOM TICK MARKS
+        // DRAW BOTTOM TICK MARKS
         yPos = this.centerY + yPosIncrement;
         unit = -1 * this.unitsPerTick;
-        ///while Y-position smaller than canvas HEIGHT
+        // while Y-position smaller than canvas HEIGHT
         while(yPos < this.canvas.height){
-            ////draw ticks + unit
+            // draw ticks + unit
             context.moveTo(this.centerX - this.tickSize / 2, yPos);
             context.lineTo(this.centerX + this.tickSize / 2, yPos);
             context.stroke();
             context.fillText(unit, this.centerX + this.tickSize / 2 - 3, yPos);
-            ////change Y-position + unit value
+            // change Y-position + unit value
             unit -= this.unitsPerTick;
             yPos = Math.round(yPos + yPosIncrement);
         }
-        ////pull from stack
         context.restore();
     };
     /**
@@ -224,25 +198,23 @@
      * @param thickness
      */
     Graph.prototype.drawEquation = function(Yx, color, thickness) {
-        //RETRIEVE CONTEXT
+        // RETRIEVE CONTEXT
         var context = this.context;
-        ////push to stack
         context.save();
-        //context.save();
-        //translation + scaling
+        context.save();
+        // translation + scaling
         this.transformContext();
 
-        //CONTEXT SETTINGS : needed for drawing purposes
+        // CONTEXT SETTINGS : needed for drawing purposes
         context.beginPath();
         context.moveTo(Yx[0][0], Yx[0][1]);
 
-        //DRAW LINE : iteration by iteration
+        // DRAW LINE : iteration by iteration
         for(var i = 1; i < Yx.length; i++) {
             context.lineTo(Yx[i][0], Yx[i][1]);
         }
 
-        //LINE SETTINGS
-        ///pull from stack twice
+        // LINE SETTINGS
         context.restore();
         context.lineJoin = 'round';
         context.lineWidth = thickness;
@@ -250,63 +222,7 @@
         context.stroke();
         context.restore();
     };
-	/**
-     * FUNCTION : DRAW PATH -> draw stairs
-     */
-    Graph.prototype.drawPath= function(equation){
-        //RETRIEVE VARIABLE FROM DOCUMENT + CONTEXT
-        var xo=document.getElementById('XE').value;
-        var context=this.context;
-        //push to stack
-        context.save();
-        context.save();
-        //translation + scaling
-        this.transformContext();
-        //get lambda from document
-        var lamb=document.getElementById('lambda').value;
-        context.beginPath();
-        var tmpx=parseFloat(xo);
-        var tmpy=lamb*(equation(tmpx))+tmpx;
 
-        context.moveTo(tmpx,tmpy);
-
-        //draw stairs
-        var count=0;
-        if(tmpy>=tmpx)
-        {
-            while(tmpx!=tmpy && count<=40)
-            {
-                count++;
-                context.lineTo(tmpy,tmpy);
-                tmpx=tmpy;
-                tmpy=lamb*equation(tmpx)+tmpx;
-                context.lineTo(tmpx,tmpy);
-            }
-            if(count>40)
-            {
-                alert('choisir une autre valeur que '+xo+'('+count+'iterations)');
-
-            }
-            else
-            {
-                document.getElementById('testRac').innerHTML = tmpx+'='+tmpy;
-            }
-        }
-        else
-        {
-            alert('choisir borne plus grande que '+xo+'!');
-        }
-        //pull from stack
-        context.restore();
-
-        context.lineJoin='round';
-        context.lineWidth=1;
-        context.strokeStyle='black';
-
-        context.stroke();
-        context.restore();
-
-    };
     /**
      * FUNCTION : TRANSFORM CONTEXT - translation + scaling
      */
@@ -323,72 +239,49 @@
         context.scale(this.scaleX, -this.scaleY);
     };
 
-    /**
-     * LISTENER : GET EQUATION 1
-     * */
-
     document.getElementById('equ1').addEventListener('click', function() {
         equationSelected = equation1;
         displayGraph(equationSelected);
-        document.getElementById('testRac').innerHTML="";
-
     });
-    /**
-     * LISTENER : GET EQUATION 2
-     */
+
     document.getElementById('equ2').addEventListener('click', function() {
         equationSelected = equation2;
         displayGraph(equationSelected);
-        document.getElementById('testRac').innerHTML="";
     });
 
-    /**
-     * LISTENER : GET LAMBDA
-     */
     document.getElementById('lambda').addEventListener('change', function() {
         displayGraph(equationSelected);
     });
-    /**
-     * LISTENER : GET X0
-     */
-    document.getElementById('XE').addEventListener('change',function(){
-       displayGraph(equationSelected);
-    });
-
-
 
     /**
-     * FUNCTION : DISPLAY GRAPH
+     * Affichage des graphiques
      */
     function displayGraph(equation) {
-        //clear arrays
+        // clear arrays
         Fx = [];
         Gx = [];
         Dx = [];
-        roots = [];
+        racines = [];
+
         var min;
         var max;
-        //retrieve lambda
         var lambda = parseInt(document.getElementById('lambda').value)
-
-        //test for automated zoom
         if(lambda != 0) {
             calc(equation, lambda);
 
-            if (roots.length == 0) {
+            if (racines.length == 0) {
                 min = -100;
                 max = 100;
-            } else if (roots.length == 1) {
-                min = roots[0] - 10;
-                max = roots[0] + 10;
+            } else if (racines.length == 1) {
+                min = racines[0] - 10;
+                max = racines[0] + 10;
             } else {
-                max = Math.round(roots[roots.length - 1]);
-                min = Math.round(roots[0]);
+                max = Math.round(racines[racines.length - 1]);
+                min = Math.round(racines[0]);
             }
 
             var units = (max <= 20) ? 1 : 10;
 
-            //input graph's settings
             var myGraph = new Graph({
                 canvasId: 'myCanvas',
                 minX: min,
@@ -397,22 +290,16 @@
                 maxY: max,
                 unitsPerTick: units
             });
-
-            ///DRAW EQUATIONS ON GRAPH
             myGraph.drawEquation(Fx, 'red', 1);
             myGraph.drawEquation(Gx, 'blue', 1);
             myGraph.drawEquation(Dx, 'green', 1);
 
-            ///TEST STAIRS
-            myGraph.drawPath(equation);
-
-            if (roots.length != 0) {
-                document.getElementById('roots').innerHTML = "Racines : ";
-                for (var i = 0; i < roots.length; i++) {
-                    document.getElementById('roots').innerHTML = document.getElementById('roots').innerHTML + roots[i] + ", ";
+            if (racines.length != 0) {
+                document.getElementById('racines').innerHTML = "Racines : ";
+                for (var i = 0; i < racines.length; i++) {
+                    document.getElementById('racines').innerHTML = document.getElementById('racines').innerHTML + racines[i] + " | ";
                 }
             }
-
         }
         else {
             var myGraph = new Graph({
@@ -425,11 +312,7 @@
             });
         }
     }
-    /**
-     * FUNCTION : CALC -> calculate points for graph
-     * @param equation
-     * @param lambda
-     */
+
     function calc (equation, lambda) {
         var i = 0;
         // the maximum round
@@ -441,28 +324,21 @@
                 var g = x + lambda * y;
                 Gx.push([x,g]);
                 if(Math.round(g*100)/100 == Math.round(x*100)/100){
-                    roots.push(Math.round(x*100)/100);
+                    racines.push(Math.round(x*100)/100);
                 }
             }
         }
     }
-    /**
-     * FUNCTION : EQUATION 1
-     * @param x
-     * @returns {number}
-     */
+
     function equation1(x){
         return Math.sin(x)-x/13;
     }
 
-    /**
-     * FUNCTION : EQUATION 2
-     * @param x
-     * @returns {number}
-     */
     function equation2(x) {
         return x/(1-Math.pow(x, 2));
     }
+
+
 </script>
 <!-- JAVASCRIPT END -->
 </body>
