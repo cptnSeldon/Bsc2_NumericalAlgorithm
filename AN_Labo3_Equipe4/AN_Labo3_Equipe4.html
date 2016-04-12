@@ -10,12 +10,24 @@
 <body onload="onLoadBody();">
 <h2>Labo 3 : Présentation de la méthode de Gauss</h2>
 <p><label>Fichier Json à charger : <input type="file" name="inputFile" id="inputFile" accept=".json"/></label></p>
+<p><label><input type="submit" name="submit" id="submit" value="Charger le fichier"/></label></p>
 <script>
+    /**
+     * Input file Listener
+     */
+//    document.getElementById('inputFile').addEventListener('change', handleFileSelect, false);
+    document.getElementById('submit').addEventListener('click', function(){
+        handleFileSelect(document.getElementById('inputFile'));
+    });
 
-    document.getElementById('inputFile').addEventListener('change', handleFileSelect, false);
+    /*****************************************************************************
+     * READ JSON FILE
+     *****************************************************************************/
 
+    /**
+     * Check for the various File API support.
+     */
     function onLoadBody(){
-        // Check for the various File API support.
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             // Great success! All the File APIs are supported.
         } else {
@@ -23,27 +35,42 @@
         }
     }
 
+    /**
+     *  Read local file
+     */
     function handleFileSelect(evt) {
-        var files = evt.target.files; // FileList object
+        var file = document.getElementById('inputFile').files[0]; // File object
 
-        // Loop through the FileList
-        for (var i = 0, f; f = files[i]; i++) {
+        var reader = new FileReader();
 
-            var reader = new FileReader();
+        // Closure to capture the file information.
+        reader.onload = (function(theFile) {
+            return function(e) {
+                // Use data
+                test(e.target.result.toString());
+            };
+        })(file);
 
-            // Closure to capture the file information.
-            reader.onload = (function(theFile) {
-                return function(e) {
-                    test(e.target.result.toString());
-                };
-            })(f);
-
-            // Read in the file.
-            reader.readAsText(f);
-        }
+        // Read in the file.
+        reader.readAsText(file);
 
     }
 
+    /**
+     *
+     */
+    function test(obj) {
+        var json = json2array(JSON.parse(obj.toString()));
+        var A = json[0];
+        var B = json[1][0];
+
+        var sol = gauss(A, B);
+        alert(sol);
+    }
+
+    /**
+     * Convert json object to array
+     */
     function json2array(json){
         var result = [];
         var keys = Object.keys(json);
@@ -53,15 +80,14 @@
         return result;
     }
 
-    function test(obj) {
-        var json = json2array(JSON.parse(obj.toString()));
 
-        // Deuxième élément de la deuxième ligne
-        alert(json[1][1]);
-    }
+    /*****************************************************************************
+     * GAUSS
+     *****************************************************************************/
 
     /**
      * Reverse rows and cols of the matrix A
+     * => Li <-> Lj
      *
      * @param A
      * @param i
@@ -75,6 +101,7 @@
 
     /**
      * Transvection of the matrix A
+     * => Li <-Li + mu*Lj
      * Wikipédia - https://en.wikipedia.org/wiki/Shear_mapping
      *
      * @param A
@@ -83,19 +110,20 @@
      * @param mu
      */
     function transvection(A, i, j, mu) {
-        if(!A[0].isArray){
-            A[i] = A[i] + mu*A[j];
+        // If A is a column matrix
+        if(!Array.isArray(A[0])){
+            A[i] = A[i] + (mu*A[j]);
         } else {
-            // Cols of A
-            var n = A[0].size;
+            // Number of cols
+            var n = A[0].length;
             for(var k = 0; k < n; k++) {
-                A[i][k] = A[i][k] + mu * A[j][k];
+                A[i][k] = A[i][k] + (mu * A[j][k]);
             }
         }
     }
 
     /**
-     * Pivot
+     * Maximum Pivot
      *
      * @param A
      * @param j0
@@ -103,7 +131,7 @@
      */
     function pivot_partiel(A, j0) {
         // Rows of A
-        var n = A.size;
+        var n = A.length;
         // Index of row with max pivot
         var iMax = j0;
         for(var i = j0+1; i < n; i++) {
@@ -123,31 +151,30 @@
      * @returns {Array}
      */
     function triangle(A, b) {
-        var n = b.size;
+        var n = b.length;
         var x = new Array(n+1).join('0').split('').map(parseFloat);
         x[n-1] = b[n-1]/A[n-1][n-1];
-        for(var i = n-2; i => 0; i--) {
+        for(var i = n-2; i >= 0; i--) {
             var s = 0;
             for(var j = i+1; j < n; j++) {
-                s = s + A[i][j] * x[j]
-
+                s = s + (A[i][j] * x[j]);
             }
             x[i] = (b[i] - s)/A[i][i];
         }
         return x;
     }
 
-    function solution(A0, b0) {
+    function gauss(A0, b0) {
         // Deep copy (doesn't destroy the original matrix)
         var A = A0.slice(0);
         var b = b0.slice(0);
-        var n = A.size;
+        var n = A.length;
         // Triangulation
         for(var i = 0; i < n-1; i++) {
             var i0 = pivot_partiel(A, i);
             changeLine(A, i, i0);
             changeLine(b, i, i0);
-            for(var k = i+1; k > n; k++) {
+            for(var k = i+1; k < n; k++) {
                 var x = A[k][i]/A[i][i];
                 transvection(A, k, i, -x);
                 transvection(b, k, i, -x);
