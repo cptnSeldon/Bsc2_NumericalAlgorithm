@@ -5,33 +5,58 @@
     <title>Labo 3 | Equipe 4</title>
     <style>
         body { font-family: 'Calibri', 'Arial', sans-serif;}
+        #error{ color: red; font-weight: bold; border: 1px solid red; display: none; padding: 5px; border-radius: 5px;}
     </style>
 </head>
 <body onload="onLoadBody();">
-<h2>Labo 3 : Présentation de la méthode de Gauss</h2>
-<p><label>Fichier Json à charger : <input type="file" name="inputFile" id="inputFile" accept=".json"/></label></p>
-<p><label><input type="submit" name="submit" id="submit" value="Charger le fichier"/></label></p>
+<h2>Labo 3 : Résolution d' un système linéaire (Méthode de Gauss)</h2>
+<div id="error"></div>
+<div id="file">
+    <p><label>Fichier Json à charger : <input type="file" name="inputFile" id="inputFile" accept=".json"/></label></p>
+    <p><label><input type="button" name="uploadFile" id="uploadFile" value="Charger le fichier"/></label></p>
+</div>
+
 <script>
     /**
-     * Input file Listener
+     * Input File Listener
+     *  - Enable or disable the upload file button
+     *  - Hidden Error message
      */
-//    document.getElementById('inputFile').addEventListener('change', handleFileSelect, false);
-    document.getElementById('submit').addEventListener('click', function(){
+    document.getElementById('inputFile').addEventListener('change', function(){
+        // Remove Error Message
+        document.getElementById('error').style.display = 'none';
+        if(this.files.length == 0) {
+            document.getElementById('uploadFile').setAttribute('disabled', 'disabled');
+        } else {
+            document.getElementById('uploadFile').removeAttribute('disabled');
+        }
+    });
+    /**
+     * Upload file button Listener
+     */
+    document.getElementById('uploadFile').addEventListener('click', function(){
         handleFileSelect(document.getElementById('inputFile'));
     });
 
     /*****************************************************************************
      * READ JSON FILE
      *****************************************************************************/
-
     /**
      * Check for the various File API support.
      */
     function onLoadBody(){
+        // Disable the upload button
+        document.getElementById('uploadFile').setAttribute('disabled', 'disabled');
+
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             // Great success! All the File APIs are supported.
         } else {
-            alert('The File APIs are not fully supported in this browser.');
+            // The File APIs are not fully supported in this browser.
+            // Show a error message
+            // Hidden the div containing the upload button and input file
+            document.getElementById('error').innerHTML = "L'API File n'est pas entièrement pris en charge par ce navigateur.";
+            document.getElementById('error').style.display = 'inline-block';
+            document.getElementById('file').style.display = 'none';
         }
     }
 
@@ -40,44 +65,59 @@
      */
     function handleFileSelect(evt) {
         var file = document.getElementById('inputFile').files[0]; // File object
-
         var reader = new FileReader();
 
         // Closure to capture the file information.
         reader.onload = (function(theFile) {
             return function(e) {
                 // Use data
-                test(e.target.result.toString());
+                treatment(e.target.result.toString());
             };
         })(file);
 
         // Read in the file.
         reader.readAsText(file);
-
     }
 
     /**
+     *  Treatment
      *
+     *  - Convert the result of reading to JSON object
+     *  - Check de length of array
+     *  - Convert array A to a multidimensional array
+     *
+     *  @param obj
      */
-    function test(obj) {
-        var json = json2array(JSON.parse(obj.toString()));
-        var A = json[0];
-        var B = json[1][0];
-
-        var sol = gauss(A, B);
-        alert(sol);
+    function treatment(obj) {
+        var json = JSON.parse(obj.toString());
+        var n = json['n'];
+        var B = json['B'];
+        var A = json['A'];
+        if(B.length != n || A.length != (n*n)) {
+            document.getElementById('error').innerHTML = "La dimension des matrices ne correspond pas à la dimension donnée. "
+                    + "Veuillez vérifier votre fichier .json";
+            document.getElementById('error').style.display = 'inline-block';
+        } else {
+            A = arraToMultidimArray(A, n);
+            var sol = gauss(A, B);
+            alert(sol);
+        }
     }
 
     /**
      * Convert json object to array
      */
-    function json2array(json){
-        var result = [];
-        var keys = Object.keys(json);
-        keys.forEach(function(key){
-            result.push(json[key]);
-        });
-        return result;
+    function arraToMultidimArray(array, dim){
+        var multiArray = new Array(dim);
+        for(var i = 0; i < dim; i++)
+            multiArray[i] = new Array(dim);
+        var k = 0;
+        for(var i = 0; i < dim; i++) {
+            for(var j = 0; j < dim; j++) {
+                multiArray[i][j] = array[k++];
+            }
+        }
+        return multiArray;
     }
 
 
@@ -164,6 +204,13 @@
         return x;
     }
 
+    /**
+     * Gauss
+     *
+     * @param A0
+     * @param b0
+     * @returns {Array}
+     */
     function gauss(A0, b0) {
         // Deep copy (doesn't destroy the original matrix)
         var A = A0.slice(0);
@@ -182,8 +229,6 @@
         }
         return triangle(A, b);
     }
-
-
 </script>
 </body>
 </html>
