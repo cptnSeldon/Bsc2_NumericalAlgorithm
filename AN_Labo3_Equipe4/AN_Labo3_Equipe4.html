@@ -15,6 +15,12 @@
     <p><label>Fichier Json à charger : <input type="file" name="inputFile" id="inputFile" accept=".json"/></label></p>
     <p><label><input type="button" name="uploadFile" id="uploadFile" value="Charger le fichier"/></label></p>
 </div>
+<div id="data">
+    <h3>Données</h3>
+</div>
+<div id="doc">
+    <h3>Doc</h3>
+</div>
 
 <script>
     /**
@@ -35,6 +41,7 @@
      * Upload file button Listener
      */
     document.getElementById('uploadFile').addEventListener('click', function(){
+        document.getElementById('error').style.display = 'none';
         handleFileSelect(document.getElementById('inputFile'));
     });
 
@@ -98,7 +105,7 @@
                     + "Veuillez vérifier votre fichier .json";
             document.getElementById('error').style.display = 'inline-block';
         } else {
-            A = arraToMultidimArray(A, n);
+            A = arrayToMultidimArray(A, n);
             var sol = gauss(A, B);
             alert(sol);
         }
@@ -107,7 +114,7 @@
     /**
      * Convert json object to array
      */
-    function arraToMultidimArray(array, dim){
+    function arrayToMultidimArray(array, dim){
         var multiArray = new Array(dim);
         for(var i = 0; i < dim; i++)
             multiArray[i] = new Array(dim);
@@ -190,7 +197,7 @@
      * @param b
      * @returns {Array}
      */
-    function triangle(A, b) {
+    function substitution(A, b) {
         var n = b.length;
         var x = new Array(n+1).join('0').split('').map(parseFloat);
         x[n-1] = b[n-1]/A[n-1][n-1];
@@ -227,7 +234,30 @@
                 transvection(b, k, i, -x);
             }
         }
-        return triangle(A, b);
+        if(deternimant(A)) {
+            return substitution(A, b);
+        } else {
+            return [0,0,0];
+        }
+    }
+
+    /**
+     *
+     * @param A
+     * @returns {boolean}
+     */
+    function deternimant(A) {
+        // Afficher le deternimant
+        var determinant = 1;
+        for(var i = 0; i < A.length; i++) {
+            determinant *= A[i][i];
+        }
+        // Retourne vrai si existant
+        if(determinant != 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 </script>
 </body>
