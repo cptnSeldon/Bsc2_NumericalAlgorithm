@@ -18,7 +18,7 @@
     <p><label><input type="button" name="uploadFile" id="uploadFile" value="Charger le fichier"/></label></p>
 </div>
 <div id="data">
-    <h3>Données</h3>
+    <h3>Affichage des valeurs</h3>
     <p id="results"></p>
 </div>
 <div id="doc">
@@ -60,10 +60,10 @@
             table += '<tr>';
             if(matrix[i][0] != undefined) {
                 for (var j = 0; j < dim; j++) {
-                    table += '<td>' + matrix[i][j] + '</td>';
+                    table += '<td>' + matrix[i][j].toFixed(2) + '</td>';
                 }
             } else {
-                table += '<td>' + matrix[i] + '</td>';
+                table += '<td>' + matrix[i].toFixed(2) + '</td>';
             }
             table += '</tr>';
         }
@@ -262,6 +262,10 @@
                 transvection(b, k, i, -x);
             }
         }
+
+        // Display upper triangular matrix
+        displayMatrix("A'", A, n);
+
         // Test determinant
         if(deternimant(A)) {
             return substitution(A, b);
@@ -281,7 +285,7 @@
             determinant *= A[i][i];
         }
         // Display determinant
-        document.getElementById('results').innerHTML = document.getElementById('results').innerHTML + "Determinant : " + determinant;
+        document.getElementById('results').innerHTML = document.getElementById('results').innerHTML + "Determinant : " + determinant.toFixed(2);
 
         // Return if determinant is 0 or not
         if(determinant != 0) {
