@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <title>Labo 3 | Equipe 4</title>
     <style>
-        body { font-family: 'Calibri', 'Arial', sans-serif;}
-        #error{ color: red; font-weight: bold; border: 1px solid red; display: none; padding: 5px; border-radius: 5px;}
+        body { font-family: 'Calibri', 'Arial', sans-serif; }
+        table { font-size: 1.2em; border-collapse: collapse; margin-bottom: 5px;}
+        #error { color: red; font-weight: bold; border: 1px solid red; display: none; padding: 5px; border-radius: 5px;}
+        #data { display: none;}
     </style>
 </head>
 <body onload="onLoadBody();">
@@ -17,9 +19,11 @@
 </div>
 <div id="data">
     <h3>Données</h3>
+    <p id="results"></p>
 </div>
 <div id="doc">
     <h3>Doc</h3>
+    <p>Bla...bla...</p>
 </div>
 
 <script>
@@ -31,6 +35,7 @@
     document.getElementById('inputFile').addEventListener('change', function(){
         // Remove Error Message
         document.getElementById('error').style.display = 'none';
+        document.getElementById('data').style.display = 'none';
         if(this.files.length == 0) {
             document.getElementById('uploadFile').setAttribute('disabled', 'disabled');
         } else {
@@ -43,7 +48,28 @@
     document.getElementById('uploadFile').addEventListener('click', function(){
         document.getElementById('error').style.display = 'none';
         handleFileSelect(document.getElementById('inputFile'));
+        document.getElementById('data').style.display = 'block';
     });
+
+    /**
+     * Display de matrice
+     */
+    function displayMatrix(letter, matrix, dim) {
+        var table = '<table border="1"><tr><td rowspan="' + (dim+1) + '">' + letter + ' = </td></tr>';
+        for(var i = 0; i < dim; i++) {
+            table += '<tr>';
+            if(matrix[i][0] != undefined) {
+                for (var j = 0; j < dim; j++) {
+                    table += '<td>' + matrix[i][j] + '</td>';
+                }
+            } else {
+                table += '<td>' + matrix[i] + '</td>';
+            }
+            table += '</tr>';
+        }
+        table += '</table>';
+        document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + table;
+    }
 
     /*****************************************************************************
      * READ JSON FILE
@@ -105,9 +131,12 @@
                     + "Veuillez vérifier votre fichier .json";
             document.getElementById('error').style.display = 'inline-block';
         } else {
+            document.getElementById('results').innerHTML = "Dimension : " + n;
             A = arrayToMultidimArray(A, n);
-            var sol = gauss(A, B);
-            alert(sol);
+            displayMatrix("A", A, n);
+            displayMatrix("B", B, n);
+            var X = gauss(A, B);
+            displayMatrix("X", X, n);
         }
     }
 
@@ -131,7 +160,6 @@
     /*****************************************************************************
      * GAUSS
      *****************************************************************************/
-
     /**
      * Reverse rows and cols of the matrix A
      * => Li <-> Lj
@@ -148,7 +176,7 @@
 
     /**
      * Transvection of the matrix A
-     * => Li <-Li + mu*Lj
+     * => Li <- (Li + mu*Lj)
      * Wikipédia - https://en.wikipedia.org/wiki/Shear_mapping
      *
      * @param A
@@ -234,6 +262,7 @@
                 transvection(b, k, i, -x);
             }
         }
+        // Test determinant
         if(deternimant(A)) {
             return substitution(A, b);
         } else {
@@ -242,17 +271,19 @@
     }
 
     /**
-     *
+     * Calculation of determinant
      * @param A
      * @returns {boolean}
      */
     function deternimant(A) {
-        // Afficher le deternimant
         var determinant = 1;
         for(var i = 0; i < A.length; i++) {
             determinant *= A[i][i];
         }
-        // Retourne vrai si existant
+        // Display determinant
+        document.getElementById('results').innerHTML = document.getElementById('results').innerHTML + "Determinant : " + determinant;
+
+        // Return if determinant is 0 or not
         if(determinant != 0) {
             return true;
         } else {
