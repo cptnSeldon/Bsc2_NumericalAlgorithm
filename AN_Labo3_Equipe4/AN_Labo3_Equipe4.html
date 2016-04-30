@@ -5,7 +5,9 @@
     <title>Labo 3 | Equipe 4</title>
     <style>
         body { font-family: 'Calibri', 'Arial', sans-serif; }
-        table { font-size: 1.2em; border-collapse: collapse; margin-bottom: 5px;}
+        table { display: inline-block; border-collapse: collapse; padding: 5px; }
+        th { border-bottom: 1px solid black; }
+        td { text-align: right; padding: 2px;}
         #error { color: red; font-weight: bold; border: 1px solid red; display: none; padding: 5px; border-radius: 5px;}
         #data { display: none;}
     </style>
@@ -22,11 +24,16 @@
     <p id="results"></p>
 </div>
 <div id="doc">
-    <h3>Doc</h3>
-    <p>Bla...bla...</p>
+    <h3>Guide d'utilisation</h3>
+    <p>
+        Cette application ...
+    </p>
 </div>
 
 <script>
+    /*****************************************************************************
+     * LISTENER
+     *****************************************************************************/
     /**
      * Input File Listener
      *  - Enable or disable the upload file button
@@ -35,6 +42,7 @@
     document.getElementById('inputFile').addEventListener('change', function(){
         // Remove Error Message
         document.getElementById('error').style.display = 'none';
+        // Remove Results
         document.getElementById('data').style.display = 'none';
         if(this.files.length == 0) {
             document.getElementById('uploadFile').setAttribute('disabled', 'disabled');
@@ -46,30 +54,13 @@
      * Upload file button Listener
      */
     document.getElementById('uploadFile').addEventListener('click', function(){
+        // Remove Error Message
         document.getElementById('error').style.display = 'none';
+        // Read the file
         handleFileSelect(document.getElementById('inputFile'));
+        // Display the div that contains results
         document.getElementById('data').style.display = 'block';
     });
-
-    /**
-     * Display de matrice
-     */
-    function displayMatrix(letter, matrix, dim) {
-        var table = '<table border="1"><tr><td rowspan="' + (dim+1) + '">' + letter + ' = </td></tr>';
-        for(var i = 0; i < dim; i++) {
-            table += '<tr>';
-            if(matrix[i][0] != undefined) {
-                for (var j = 0; j < dim; j++) {
-                    table += '<td>' + matrix[i][j].toFixed(2) + '</td>';
-                }
-            } else {
-                table += '<td>' + matrix[i].toFixed(2) + '</td>';
-            }
-            table += '</tr>';
-        }
-        table += '</table>';
-        document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + table;
-    }
 
     /*****************************************************************************
      * READ JSON FILE
@@ -80,7 +71,6 @@
     function onLoadBody(){
         // Disable the upload button
         document.getElementById('uploadFile').setAttribute('disabled', 'disabled');
-
         if (window.File && window.FileReader && window.FileList && window.Blob) {
             // Great success! All the File APIs are supported.
         } else {
@@ -97,13 +87,14 @@
      *  Read local file
      */
     function handleFileSelect(evt) {
-        var file = document.getElementById('inputFile').files[0]; // File object
+        // File object
+        var file = document.getElementById('inputFile').files[0];
         var reader = new FileReader();
 
         // Closure to capture the file information.
         reader.onload = (function(theFile) {
             return function(e) {
-                // Use data
+                // Treatment of data
                 treatment(e.target.result.toString());
             };
         })(file);
@@ -122,32 +113,52 @@
      *  @param obj
      */
     function treatment(obj) {
+        // Transform object to array
         var json = JSON.parse(obj.toString());
         var n = json['n'];
         var B = json['B'];
         var A = json['A'];
+        // Check dimensions
         if(B.length != n || A.length != (n*n)) {
             document.getElementById('error').innerHTML = "La dimension des matrices ne correspond pas à la dimension donnée. "
                     + "Veuillez vérifier votre fichier .json";
             document.getElementById('error').style.display = 'inline-block';
         } else {
-            document.getElementById('results').innerHTML = "Dimension : " + n;
+            // Convert simple array A to multidimensional array
             A = arrayToMultidimArray(A, n);
-            displayMatrix("A", A, n);
-            displayMatrix("B", B, n);
+            // Clean results div
+            document.getElementById("results").innerHTML = "";
+
+            // Display de linare system
+            document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + "<b>Dimension: </b>" + n + "<br/><br/>";
+            displayMatrix("A", A);
+            var table = '<table><tr><td rowspan="' + (n-1) + '">*</td></tr></table>';
+            document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + table;
+            displayInitX(n);
+            table = '<table><tr><td rowspan="' + (n-1) + '">=</td></tr></table>';
+            document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + table;
+            displayMatrix("B", B);
+            document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + "<br/><br/>";
+
+            // Search the solution
             var X = gauss(A, B);
-            displayMatrix("X", X, n);
+
+            // Display Result
+            displayMatrix("X", X);
         }
     }
 
     /**
-     * Convert json object to array
+     * Convert simple array to multidimensional array
      */
     function arrayToMultidimArray(array, dim){
+        // New Array
         var multiArray = new Array(dim);
+        // Each case of the array contains a array
         for(var i = 0; i < dim; i++)
             multiArray[i] = new Array(dim);
         var k = 0;
+        // Fill the new multidimensional array
         for(var i = 0; i < dim; i++) {
             for(var j = 0; j < dim; j++) {
                 multiArray[i][j] = array[k++];
@@ -156,10 +167,113 @@
         return multiArray;
     }
 
+    /**
+     * Display de matrice
+     */
+    function displayMatrix(letter, matrix) {
+        var dim = matrix.length;
+        var table = '<table><tr><th colspan="' + (dim+1) + '">' + letter + '</th></tr>';
+        for(var i = 0; i < dim; i++) {
+            table += '<tr>';
+            if(matrix[i][0] != undefined) {
+                for (var j = 0; j < dim; j++) {
+                    table += '<td>' + matrix[i][j].toFixed(2) + '</td>';
+                }
+            } else {
+                table += '<td>' + matrix[i].toFixed(2) + '</td>';
+            }
+            table += '</tr>';
+        }
+        table += '</table>';
+        document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + table;
+    }
+
+    /**
+     * Display the initial vector X
+     */
+    function displayInitX(dim){
+        var table = '<table><tr><th>X</th></tr>';
+        for(var i = 0; i < dim; i++) {
+            table += '<tr><td>x' + i + '</td></tr>'
+        }
+        table += '</table>'
+        document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + table;
+    }
 
     /*****************************************************************************
      * GAUSS
      *****************************************************************************/
+    /**
+     * Gauss
+     *
+     * @param A0
+     * @param b0
+     * @returns {Array}
+     */
+    function gauss(A0, b0) {
+        // Deep copy (doesn't destroy the original matrix)
+        var A = A0.slice(0);
+        var b = b0.slice(0);
+        var n = A.length;
+        // Triangulation
+        for(var i = 0; i < n-1; i++) {
+            var i0 = pivot_partiel(A, i);
+            changeLine(A, i, i0);
+            changeLine(b, i, i0);
+            for(var k = i+1; k < n; k++) {
+                var x = A[k][i]/A[i][i];
+                transvection(A, k, i, -x);
+                transvection(b, k, i, -x);
+            }
+        }
+        // Display triangular matrix and determinant
+        displayMatrix("A triangulaire", A);
+        document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + "<br/><b>Determinant: </b>" + deternimant(A);
+        document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + "<br/><br/>";
+
+        /* Test the determinant
+         *  - If it's zero then return 0
+         *  - If not then return the result of subtitution
+         */
+        return (deternimant(A) != 0) ? substitution(A, b) : [0,0,0];
+    }
+
+    /**
+     * Calculation of determinant
+     * @param A
+     * @returns {boolean}
+     */
+    function deternimant(A) {
+        var determinant = 1;
+        for(var i = 0; i < A.length; i++) {
+            determinant *= A[i][i];
+        }
+        // Return determinant
+        return determinant;
+    }
+
+    /**
+     * Solution of Ax=b
+     * A is a upper triangular matrix
+     *
+     * @param A
+     * @param b
+     * @returns {Array}
+     */
+    function substitution(A, b) {
+        var n = b.length;
+        var x = new Array(n+1).join('0').split('').map(parseFloat);
+        x[n-1] = b[n-1]/A[n-1][n-1];
+        for(var i = n-2; i >= 0; i--) {
+            var s = 0;
+            for(var j = i+1; j < n; j++) {
+                s = s + (A[i][j] * x[j]);
+            }
+            x[i] = (b[i] - s)/A[i][i];
+        }
+        return x;
+    }
+
     /**
      * Reverse rows and cols of the matrix A
      * => Li <-> Lj
@@ -215,84 +329,6 @@
             }
         }
         return iMax;
-    }
-
-    /**
-     * Solution of Ax=b
-     * A is a upper triangular matrix
-     *
-     * @param A
-     * @param b
-     * @returns {Array}
-     */
-    function substitution(A, b) {
-        var n = b.length;
-        var x = new Array(n+1).join('0').split('').map(parseFloat);
-        x[n-1] = b[n-1]/A[n-1][n-1];
-        for(var i = n-2; i >= 0; i--) {
-            var s = 0;
-            for(var j = i+1; j < n; j++) {
-                s = s + (A[i][j] * x[j]);
-            }
-            x[i] = (b[i] - s)/A[i][i];
-        }
-        return x;
-    }
-
-    /**
-     * Gauss
-     *
-     * @param A0
-     * @param b0
-     * @returns {Array}
-     */
-    function gauss(A0, b0) {
-        // Deep copy (doesn't destroy the original matrix)
-        var A = A0.slice(0);
-        var b = b0.slice(0);
-        var n = A.length;
-        // Triangulation
-        for(var i = 0; i < n-1; i++) {
-            var i0 = pivot_partiel(A, i);
-            changeLine(A, i, i0);
-            changeLine(b, i, i0);
-            for(var k = i+1; k < n; k++) {
-                var x = A[k][i]/A[i][i];
-                transvection(A, k, i, -x);
-                transvection(b, k, i, -x);
-            }
-        }
-
-        // Display upper triangular matrix
-        displayMatrix("A'", A, n);
-
-        // Test determinant
-        if(deternimant(A)) {
-            return substitution(A, b);
-        } else {
-            return [0,0,0];
-        }
-    }
-
-    /**
-     * Calculation of determinant
-     * @param A
-     * @returns {boolean}
-     */
-    function deternimant(A) {
-        var determinant = 1;
-        for(var i = 0; i < A.length; i++) {
-            determinant *= A[i][i];
-        }
-        // Display determinant
-        document.getElementById('results').innerHTML = document.getElementById('results').innerHTML + "Determinant : " + determinant.toFixed(2);
-
-        // Return if determinant is 0 or not
-        if(determinant != 0) {
-            return true;
-        } else {
-            return false;
-        }
     }
 </script>
 </body>
