@@ -13,7 +13,7 @@
     </style>
 </head>
 <body onload="onLoadBody();">
-<h2>Labo 3 : Résolution d' un système linéaire (Méthode de Gauss)</h2>
+<h2>Labo 3 : Résolution d'un système linéaire (Gauss)</h2>
 <div id="error"></div>
 <div id="file">
     <p><label>Fichier Json à charger : <input type="file" name="inputFile" id="inputFile" accept=".json"/></label></p>
@@ -26,7 +26,16 @@
 <div id="doc">
     <h3>Guide d'utilisation</h3>
     <p>
-        Cette application ...
+        Cette application permet de calculer les systèmes linéaires selon la méthode de Gauss. Pour ce faire, il suffit de charger un fichier JSON
+		contenant une matrice carrée de n-dimension.
+	</p> 
+	<p>
+		L'affichage se fait dans l'ordre suivant : <br/>
+		<li>système de départ (A*X = B)</li>
+		<li>matrice A triangularisée</li> 
+		<li>déterminant du système</li>
+		<li>résultat pour le vecteur X</li>
+		<li>temps total pour calculer les inconnues en ms (alert javascript)</li>
     </p>
 </div>
 
@@ -113,6 +122,9 @@
      *  @param obj
      */
     function treatment(obj) {
+	
+		//elapsed time : start
+		var start = new Date().getTime();
         // Transform object to array
         var json = JSON.parse(obj.toString());
         var n = json['n'];
@@ -145,6 +157,11 @@
 
             // Display Result
             displayMatrix("X", X);
+			
+			//elapsed time : end
+			var end = new Date().getTime();
+			var time = end - start;
+			alert('Temps d\'exécution: ' + time + 'ms');
         }
     }
 
@@ -168,12 +185,15 @@
     }
 
     /**
-     * Display de matrice
+     * Display matrix
      */
     function displayMatrix(letter, matrix) {
+		//get dimension
         var dim = matrix.length;
+		//create table -> for readability purposes
         var table = '<table><tr><th colspan="' + (dim+1) + '">' + letter + '</th></tr>';
-        for(var i = 0; i < dim; i++) {
+        //get matrix contents -> put it in the "table" variable
+		for(var i = 0; i < dim; i++) {
             table += '<tr>';
             if(matrix[i][0] != undefined) {
                 for (var j = 0; j < dim; j++) {
@@ -185,6 +205,7 @@
             table += '</tr>';
         }
         table += '</table>';
+		//show matrix in "table" format
         document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + table;
     }
 
@@ -192,11 +213,14 @@
      * Display the initial vector X
      */
     function displayInitX(dim){
+		//create table -> for readability purposes
         var table = '<table><tr><th>X</th></tr>';
+		//get x vector -> put in the "table" variable
         for(var i = 0; i < dim; i++) {
             table += '<tr><td>x' + i + '</td></tr>'
         }
         table += '</table>'
+		//show x-vector in "table" format
         document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + table;
     }
 
@@ -228,12 +252,12 @@
         }
         // Display triangular matrix and determinant
         displayMatrix("A triangulaire", A);
-        document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + "<br/><b>Determinant: </b>" + deternimant(A);
+        document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + "<br/><b>Déterminant: </b>" + deternimant(A);
         document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + "<br/><br/>";
 
         /* Test the determinant
          *  - If it's zero then return 0
-         *  - If not then return the result of subtitution
+         *  - If not then return the result of substitution
          */
         return (deternimant(A) != 0) ? substitution(A, b) : [0,0,0];
     }
@@ -245,6 +269,7 @@
      */
     function deternimant(A) {
         var determinant = 1;
+		//calculate determinant : post triangularisation
         for(var i = 0; i < A.length; i++) {
             determinant *= A[i][i];
         }
@@ -261,9 +286,11 @@
      * @returns {Array}
      */
     function substitution(A, b) {
+		//substitution function : used in Gauss
         var n = b.length;
         var x = new Array(n+1).join('0').split('').map(parseFloat);
         x[n-1] = b[n-1]/A[n-1][n-1];
+		
         for(var i = n-2; i >= 0; i--) {
             var s = 0;
             for(var j = i+1; j < n; j++) {
@@ -283,6 +310,7 @@
      * @param j
      */
     function changeLine(A, i, j) {
+		//displays matrix in the "right" format
         var tmp = A[i];
         A[i] = A[j];
         A[j] = tmp;
@@ -329,7 +357,7 @@
             }
         }
         return iMax;
-    }
+    }	
 </script>
 </body>
 </html>
