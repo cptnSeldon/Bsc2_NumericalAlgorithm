@@ -20,6 +20,8 @@
     <p><label><input type="button" name="uploadFile" id="uploadFile" value="Charger le fichier"/></label></p>
 </div>
 <div id="data">
+    <h3>Temps d'exécution</h3>
+    <p id="time"></p>
     <h3>Affichage des valeurs</h3>
     <p id="results"></p>
 </div>
@@ -28,11 +30,11 @@
     <p>
         Cette application permet de calculer les systèmes linéaires selon la méthode de Gauss. Pour ce faire, il suffit de charger un fichier JSON
 		contenant une matrice carrée de n-dimension.
-	</p> 
+	</p>
 	<p>
 		L'affichage se fait dans l'ordre suivant : <br/>
 		<li>système de départ (A*X = B)</li>
-		<li>matrice A triangularisée</li> 
+		<li>matrice A triangularisée</li>
 		<li>déterminant du système</li>
 		<li>résultat pour le vecteur X</li>
 		<li>temps total pour calculer les inconnues en ms (alert javascript)</li>
@@ -118,13 +120,8 @@
      *  - Convert the result of reading to JSON object
      *  - Check de length of array
      *  - Convert array A to a multidimensional array
-     *
-     *  @param obj
      */
     function treatment(obj) {
-	
-		//elapsed time : start
-		var start = new Date().getTime();
         // Transform object to array
         var json = JSON.parse(obj.toString());
         var n = json['n'];
@@ -152,16 +149,22 @@
             displayMatrix("B", B);
             document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + "<br/><br/>";
 
+            //elapsed time : start
+            var start = new Date().getTime();
             // Search the solution
             var X = gauss(A, B);
 
+            //elapsed time : end
+            var end = new Date().getTime();
+            var time = end - start;
+            document.getElementById("time").innerHTML = time + 'ms';
+
+            //alert('Temps d\'exécution: ' + time + 'ms');
+
             // Display Result
             displayMatrix("X", X);
-			
-			//elapsed time : end
-			var end = new Date().getTime();
-			var time = end - start;
-			alert('Temps d\'exécution: ' + time + 'ms');
+
+
         }
     }
 
@@ -229,10 +232,6 @@
      *****************************************************************************/
     /**
      * Gauss
-     *
-     * @param A0
-     * @param b0
-     * @returns {Array}
      */
     function gauss(A0, b0) {
         // Deep copy (doesn't destroy the original matrix)
@@ -264,8 +263,6 @@
 
     /**
      * Calculation of determinant
-     * @param A
-     * @returns {boolean}
      */
     function deternimant(A) {
         var determinant = 1;
@@ -280,17 +277,13 @@
     /**
      * Solution of Ax=b
      * A is a upper triangular matrix
-     *
-     * @param A
-     * @param b
-     * @returns {Array}
      */
     function substitution(A, b) {
 		//substitution function : used in Gauss
         var n = b.length;
         var x = new Array(n+1).join('0').split('').map(parseFloat);
         x[n-1] = b[n-1]/A[n-1][n-1];
-		
+
         for(var i = n-2; i >= 0; i--) {
             var s = 0;
             for(var j = i+1; j < n; j++) {
@@ -304,10 +297,6 @@
     /**
      * Reverse rows and cols of the matrix A
      * => Li <-> Lj
-     *
-     * @param A
-     * @param i
-     * @param j
      */
     function changeLine(A, i, j) {
 		//displays matrix in the "right" format
@@ -320,11 +309,7 @@
      * Transvection of the matrix A
      * => Li <- (Li + mu*Lj)
      * Wikipédia - https://en.wikipedia.org/wiki/Shear_mapping
-     *
-     * @param A
-     * @param i
-     * @param j
-     * @param mu
+
      */
     function transvection(A, i, j, mu) {
         // If A is a column matrix
@@ -339,13 +324,7 @@
         }
     }
 
-    /**
-     * Maximum Pivot
-     *
-     * @param A
-     * @param j0
-     * @returns {*}
-     */
+
     function pivot_partiel(A, j0) {
         // Rows of A
         var n = A.length;
@@ -357,7 +336,7 @@
             }
         }
         return iMax;
-    }	
+    }
 </script>
 </body>
 </html>
