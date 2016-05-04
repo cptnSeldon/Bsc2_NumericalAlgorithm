@@ -39,6 +39,22 @@
 		<li>résultat pour le vecteur X</li>
 		<li>temps total pour calculer les inconnues en ms</li>
     </p>
+    <h3>Rapport</h3>
+    <p>
+        On utilise un file API qui permet de lire le fichier JSON en local avec la méthode "onLoad", au moment de la lecture, on crée un objet JSON
+        où on récupère chaque partie (les matrices A, B et la dimension n). Les méthodes appelées dans Gauss permettent d'aléger un peu le code en le rendant
+        plus lisible.
+    </p>
+    <h4>Listing des différentes méthodes</h4>
+    <dl>
+        <dt>Gauss</dt>
+        <dd>Elle s'occupe de la triangularisation de la matrice A, en appelant les méthodes Transpose et Transvection. Cette méthode s'occupe aussi
+        d'appeler le méthode du calcul du déterminant. S'il le déterminant n'est pas nul, on appelle la méthode de substitution.</dd>
+        <dt>Transpose</dt>
+        <dd>Elle s'occupe de transposer la matrice.</dd>
+        <dt>Transvection</dt>
+        <dd></dd>
+    </dl>
 </div>
 
 <script>
@@ -241,8 +257,8 @@
         // Triangulation
         for(var i = 0; i < n-1; i++) {
             var i0 = pivot_partiel(A, i);
-            changeLine(A, i, i0);
-            changeLine(b, i, i0);
+            transpose(A, i, i0);
+            transpose(b, i, i0);
             for(var k = i+1; k < n; k++) {
                 var x = A[k][i]/A[i][i];
                 transvection(A, k, i, -x);
@@ -298,7 +314,7 @@
      * Reverse rows and cols of the matrix A
      * => Li <-> Lj
      */
-    function changeLine(A, i, j) {
+    function transpose(A, i, j) {
 		//displays matrix in the "right" format
         var tmp = A[i];
         A[i] = A[j];
