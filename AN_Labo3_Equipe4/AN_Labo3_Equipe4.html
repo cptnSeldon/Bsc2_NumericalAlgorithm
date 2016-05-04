@@ -51,13 +51,26 @@
         <dd>Elle s'occupe de la triangularisation de la matrice A. Cette méthode s'occupe aussi
         d'appeler le méthode du calcul du déterminant. S'il le déterminant n'est pas nul, on appelle la méthode de substitution.</dd>
         <dt>Substitution</dt>
-		<dd>La methode de substitution permet de trouver la solution de A.X=B</dd>
-		<dt>Determinant</dt>
-		<dd>Calcule le determinant de la matrice triangulaire</dd>       
+		<dd>La methode de substitution permet de trouver la solution de A*X=B</dd>
+		<dt>Déterminant</dt>
+		<dd>Calcule le déterminant de la matrice triangulaire.</dd>
     </dl>
 	<p>
-		D'autres méthodes sont utilisées pour l'affichage des matrices et la gestion d'evenement des boutons.
+		D'autres méthodes sont utilisées pour l'affichage des matrices et la gestion d'évènement des boutons.
 	</p>
+	<h4>Tests</h4>
+	<p>Le programme a été testé avec des matrices 3x3 et 4x4. Les résultats ont été vérifés avec Mathematica</p>
+	<p>Un autre test a été réalisé avec une matrice 250x250. La lecture et la triangularisation sont correctes mais la valeurs du détérminant est trop grande 
+		pour être codée sur 80 bits ce qui fait que le programme affiche "infinity".
+	</p>
+	<h5>Vitesses</h5>
+	<ul>
+		<li>Matrice 3x3: entre 1 et 3ms</li>
+		<li>Matrice 4X4: entre 1 et 3ms</li>
+		<li>Matrice 250x250: entre 900 et 1200ms</li>
+	</ul>
+	<h4>Remarques</h4>
+	<p>Les vitesses mesurées peuvent varier fortement d'une machine à l'autre (variation de 500 à 1000ms)</p>
 </div>
 
 <script>
@@ -88,8 +101,7 @@
         document.getElementById('error').style.display = 'none';
         // Read the file
         handleFileSelect(document.getElementById('inputFile'));
-        // Display the div that contains results
-        document.getElementById('data').style.display = 'block';
+
     });
 
     /*****************************************************************************
@@ -181,9 +193,15 @@
             //alert('Temps d\'exécution: ' + time + 'ms');
 
             // Display Result
-            displayMatrix("X", X);
-
-
+			if(X==0){
+				var table = '<table><tr><th>X</th></tr></td><tr><td>Pas de solution</td></tr></table>';
+				document.getElementById("results").innerHTML = document.getElementById("results").innerHTML + table;
+			}else{
+				displayMatrix("X", X);
+			}
+			
+			 // Display the div that contains results
+			document.getElementById('data').style.display = 'block';
         }
     }
 
