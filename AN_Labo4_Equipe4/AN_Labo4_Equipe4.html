@@ -10,8 +10,31 @@
 <body>
 <h2>Labo 4</h2>
 <!-- Contenu -->
+<canvas id="myCanvas" width="578" height="300"></canvas>
+<script src="./AN_Labo4_Equipe4.js"></script>
+<script>
+	var myGraph = new Graph({
+        canvasId: 'myCanvas',
+        minX: -10,
+        minY: -10,
+        maxX: 10,
+        maxY: 10,
+        unitsPerTick: 1
+      });
 
-<script src="graph.js">
+      myGraph.drawEquation(function(x) {
+        return 5 * Math.sin(x);
+      }, 'green', 3);
+
+      myGraph.drawEquation(function(x) {
+        return x * x;
+      }, 'blue', 3);
+
+      myGraph.drawEquation(function(x) {
+        return 1 * x;
+      }, 'red', 3);
 </script>
+ 
+
 </body>
 </html>
