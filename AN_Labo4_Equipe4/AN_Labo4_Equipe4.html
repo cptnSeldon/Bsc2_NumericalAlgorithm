@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+<!-- HEAD START -->
 <head>
     <meta charset="UTF-8">
     <title>Labo 4 | Equipe 4</title>
@@ -7,11 +8,14 @@
         body { font-family: 'Calibri', 'Arial', sans-serif; }
     </style>
 </head>
+<!-- HEAD END -->
+<!-- BODY START -->
 <body>
-<h2>Labo 4</h2>
+<h2>Dérivation numérique</h2>
 <!-- Contenu -->
 <canvas id="myCanvas" width="578" height="300"></canvas>
 <script src="./AN_Labo4_Equipe4.js"></script>
+<!-- JS START -->
 <script>
 	var myGraph = new Graph({
         canvasId: 'myCanvas',
@@ -22,19 +26,61 @@
         unitsPerTick: 1
       });
 
-      myGraph.drawEquation(function(x) {
-        return 5 * Math.sin(x);
-      }, 'green', 3);
+    //FACTORIAL
+    function factorial(n){
 
-      myGraph.drawEquation(function(x) {
-        return x * x;
+        if(n === 0)
+            return 1;
+
+        return n * factorial(n - 1);
+    }
+
+    //COSINE
+    function cosine(x){
+
+        var cos = 0;
+        //cosine : Taylor
+        for(var n = 0; n < 50; n++){
+            cos += (Math.pow(-1,n)*Math.pow(x,2*n))/factorial(2*n);
+        }
+        return cos;
+    }
+
+    //DERIVATIVE ^1
+    function Derivative_1(x){
+
+        var f, h = 1;
+
+        f = (cosine(x + h) - cosine(x - h))/2*h;
+
+        return f;
+    }
+
+    //DERIVATIVE ^2
+    function Derivative_2(x){
+
+        var f = Derivative_1(x);
+        return Derivative_1(f);
+    }
+
+    //DRAW EQUATION : cosine
+    myGraph.drawEquation(function(x) {
+
+        return cosine(x);
+
+    }, 'green', 3);
+
+    //DRAW EQUATION : f'
+    myGraph.drawEquation(function(x) {
+        //check h
+        return Derivative_1(x);
       }, 'blue', 3);
 
       myGraph.drawEquation(function(x) {
-        return 1 * x;
+        return Derivative_2(x);
       }, 'red', 3);
 </script>
- 
-
+<!-- JS END -->
 </body>
+<!-- BODY END -->
 </html>
