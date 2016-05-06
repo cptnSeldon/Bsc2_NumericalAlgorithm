@@ -7,22 +7,131 @@
     <style>
         body { font-family: 'Calibri', 'Arial', sans-serif; }
     </style>
+    <script type="text/javascript" async
+            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_CHTML">
+    </script>
 </head>
 <!-- HEAD END -->
 <!-- BODY START -->
 <body>
-<h2>Dérivation numérique</h2>
+<h2>Labo 4 : Dérivation numérique</h2>
+<p>
+    Le but de cette application est de représenter la fonction <span style="color: green;">cosinus</span> en utilisant sa série
+    de Taylor (ci-dessous), ainsi que d'afficher sa <span style="color: blue;">dérivée</span> et sa <span style="color: red;">dérivée seconde</span>.
+</p>
+<p>
+<!-- math. notation -->
+<!-- link mathml  : http://www.wiris.com/editor/demo/en/mathml-latex.html -->
+<!-- link mathjax : http://docs.mathjax.org/en/latest/start.html -->
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mi>cos</mi>
+        <mfenced>
+            <mi>x</mi>
+        </mfenced>
+        <mo>&#x000A0;</mo>
+        <mo>=</mo>
+        <mo>&#x000A0;</mo>
+        <munderover>
+            <mo>&#x02211;</mo>
+            <mrow>
+                <mi>n</mi>
+                <mo>&#x000A0;</mo>
+                <mo>=</mo>
+                <mo>&#x000A0;</mo>
+                <mn>0</mn>
+            </mrow>
+                <mo>&#x0221E;</mo>
+        </munderover>
+        <mfrac>
+            <mrow>
+                <mo>(</mo>
+                <mo>-</mo>
+                <mn>1</mn>
+                <msup>
+                    <mo>)</mo>
+                    <mi>n</mi>
+                </msup>
+                <mo>&#x000A0;</mo>
+                <msup>
+                    <mi>x</mi>
+                    <mrow>
+                        <mn>2</mn>
+                        <mi>n</mi>
+                    </mrow>
+                </msup>
+            </mrow>
+            <mrow>
+                <mn>2</mn>
+                <mi>n</mi>
+                <mo>!</mo>
+            </mrow>
+        </mfrac>
+    </math>
+</p>
+<p>
+    Le calcul de la <span style="color: blue;">dérivée</span> nous permet de savoir quelle est la pente de la tangente passant par un point x de la courbe.
+    La formule (ci-dessous) qui est utilisée dans cette application est celle utilisant la différence centrée. Le taux d'erreur est de
+    <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>O</mi><mfenced><msup><mi>h</mi><mn>2</mn></msup></mfenced></math> dans ce cas-ci.
+<p/>
+<p>
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mi>f</mi>
+        <mo>'</mo>
+        <mfenced>
+            <mi>x</mi>
+        </mfenced>
+        <mo>&#x000A0;</mo>
+        <mo>=</mo>
+        <mo>&#x000A0;</mo>
+        <mfrac>
+            <mrow>
+                <mi>f</mi>
+                <mfenced>
+                    <mrow>
+                        <mi>x</mi>
+                        <mo>+</mo>
+                        <mi>h</mi>
+                    </mrow>
+                </mfenced>
+                <mo>&#x000A0;</mo>
+                <mo>&#x000A0;</mo>
+                <mo>-</mo>
+                <mo>&#x000A0;</mo>
+                <mi>f</mi>
+                <mo>(</mo>
+                <mi>x</mi>
+                <mo>-</mo>
+                <mi>h</mi>
+                <mo>)</mo>
+            </mrow>
+            <mrow>
+                <mn>2</mn>
+                <mi>h</mi>
+            </mrow>
+        </mfrac>
+    </math>
+</p>
+<p>
+    Grâce à la <span style="color: red;">dérivée seconde</span>, on arrive à obtenir des informations quant à la variation de la pente à un endroit donnée. Si sa valeur est
+    positive, on dit que la courbe est <i>convexe</i> (pente qui monte); si elle est négative, la courbe est dite <i>concave</i> (pente qui descend); si par contre elle vaut 0,
+    on a un point d'inflexion (pente nulle). Et c'est bien ce qui est illustré par nos trois courbes.
+</p>
+<p>
+
+</p>
 <!-- Contenu -->
+<p><label for="variable_x">x : <input type="number" name="variable_x" id="variable_x" value="1" step="0.01"></label></p>
+
 <canvas id="myCanvas" width="578" height="300"></canvas>
 <script src="./AN_Labo4_Equipe4.js"></script>
 <!-- JS START -->
 <script>
 	var myGraph = new Graph({
         canvasId: 'myCanvas',
-        minX: -10,
-        minY: -10,
-        maxX: 10,
-        maxY: 10,
+        minX: -7,
+        minY: -5,
+        maxX: 7,
+        maxY: 5,
         unitsPerTick: 1
       });
 
@@ -35,19 +144,25 @@
         return n * factorial(n - 1);
     }
 
+    //COSINE TAYLOR
+    function cos_taylor(x,n){
+        return (Math.pow(-1,n)*Math.pow(x,2*n))/factorial(2*n);
+    }
+
     //COSINE
     function cosine(x){
 
         var cos = 0;
         //cosine : Taylor
         for(var n = 0; n < 50; n++){
-            cos += (Math.pow(-1,n)*Math.pow(x,2*n))/factorial(2*n);
+            cos += cos_taylor(x,n);
         }
+
         return cos;
     }
 
     //DERIVATIVE ^1
-    function Derivative_1(x){
+    function Derivative_prime(x){
 
         var f, h = 1;
 
@@ -56,11 +171,22 @@
         return f;
     }
 
-    //DERIVATIVE ^2
-    function Derivative_2(x){
+    //DERIVATIVE ^1 : slope
+    function Derivative_prime_slope(x){
 
-        var f = Derivative_1(x);
-        return Derivative_1(f);
+
+    }
+
+    //DERIVATIVE ^2
+    function Derivative_second(x){
+
+        return Derivative_prime(Derivative_prime(x));
+    }
+
+    //DERIVATIVE ^2 : slope
+    function Derivative_second_slope(x){
+
+
     }
 
     //DRAW EQUATION : cosine
@@ -68,17 +194,22 @@
 
         return cosine(x);
 
-    }, 'green', 3);
+    }, 'green', 2);
 
     //DRAW EQUATION : f'
     myGraph.drawEquation(function(x) {
         //check h
-        return Derivative_1(x);
-      }, 'blue', 3);
+        return Derivative_prime(x);
+      }, 'blue', 2);
 
+    //DRAW EQUATION : f''
       myGraph.drawEquation(function(x) {
-        return Derivative_2(x);
-      }, 'red', 3);
+        return Derivative_second(x);
+      }, 'red', 2);
+
+    myGraph.drawEquation(function(x){
+        return ;
+    }, 'violet', 3);
 </script>
 <!-- JS END -->
 </body>
