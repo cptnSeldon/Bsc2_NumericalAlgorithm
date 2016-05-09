@@ -149,3 +149,27 @@
          */
         context.scale(this.scaleX, -this.scaleY);
       };
+
+      Graph.prototype.clearGraph = function () {
+          this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+          this.drawXAxis();
+          this.drawYAxis();
+      }
+
+      Graph.prototype.drawSlope = function (equation, x1, x2, color, thickness) {
+          var context = this.context;
+          context.save();
+          context.save();
+          this.transformContext();
+
+          context.beginPath();
+          context.moveTo(x1, equation(x1));
+          context.lineTo(x2, equation(x2));
+
+          context.restore();
+          context.lineJoin = 'round';
+          context.lineWidth = thickness;
+          context.strokeStyle = color;
+          context.stroke();
+          context.restore();
+      }

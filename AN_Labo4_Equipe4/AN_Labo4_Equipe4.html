@@ -120,20 +120,84 @@
 
 </p>
 <!-- Contenu -->
-<p><label for="variable_x">x : <input type="number" name="variable_x" id="variable_x" value="1" step="0.01"></label></p>
+<p>
+    <label for="variable_x">x : <input type="number" name="variable_x" id="variable_x" value="1" step="0.01"> </label>
+    <label for="variable_h">h : <input type="number" name="variable_h" id="variable_h" value="1" step="0.01"> </label>
+    <label for="variable_n">n : <input type="number" name="variable_n" id="variable_n" value="50" step="1"></label>
+</p>
 
-<canvas id="myCanvas" width="578" height="300"></canvas>
-<script src="./AN_Labo4_Equipe4.js"></script>
+<canvas id="myCanvas" width="600" height="300"></canvas>
+<p>
+    <input type="button" name="show_f" id="show_f" value="Afficher f"/>
+    <input type="button" name="show_f_1" id="show_f_1" value="Afficher f'"/>
+    <input type="button" name="show_f_2" id="show_f_2" value="Afficher f''"/>
+    <input type="button" name="reset" id="reset" value="Vider graphe"/>
+</p>
+<p>
+    <input type="button" name="slope" id="show_slope" value="Pente en X"/>
+    <label id="slope_value"></label>
+</p>
+
 <!-- JS START -->
+<script src="./AN_Labo4_Equipe4.js"></script>
 <script>
-	var myGraph = new Graph({
+    // INIT GRAPH
+    var myGraph = new Graph({
         canvasId: 'myCanvas',
-        minX: -7,
+        minX: -10,
         minY: -5,
-        maxX: 7,
+        maxX: 10,
         maxY: 5,
         unitsPerTick: 1
-      });
+    });
+
+    /**
+     *  Listener button reset
+     *   - Clear the graph
+     */
+    document.getElementById("reset").addEventListener("click", function () {
+        myGraph.clearGraph();
+    });
+
+    document.getElementById("show_slope").addEventListener("click", function () {
+        var x = parseFloat(document.getElementById("variable_x").value);
+        var h = parseFloat(document.getElementById("variable_h").value);
+
+        myGraph.drawSlope(function(x) {
+            return cosine(x);
+        }, (x-h), (x+h), 'black', 2);
+    });
+
+    /**
+     * Listener button show_f
+     *  - DRAW EQUATION : cosine
+     */
+    document.getElementById("show_f").addEventListener("click", function () {
+        myGraph.drawEquation(function(x) {
+            return cosine(x);
+        }, 'green', 2);
+    });
+
+    /**
+     * Listener button show_f_1
+     *  - DRAW EQUATION : f'
+     */
+    document.getElementById("show_f_1").addEventListener("click", function () {
+        myGraph.drawEquation(function(x) {
+            return Derivative_prime(x);
+        }, 'blue', 2);
+    });
+
+    /**
+     * Listener button show_f_2
+     *  - DRAW EQUATION : f''
+     */
+    document.getElementById("show_f_2").addEventListener("click", function () {
+        myGraph.drawEquation(function(x) {
+            return Derivative_prime(Derivative_prime(x));
+        }, 'red', 2);
+    });
+
 
     //FACTORIAL
     function factorial(n){
@@ -146,70 +210,35 @@
 
     //COSINE TAYLOR
     function cos_taylor(x,n){
-        return (Math.pow(-1,n)*Math.pow(x,2*n))/factorial(2*n);
+        return (Math.pow(-1.0,n)*Math.pow(x,2.0*n))/factorial(2.0*n);
     }
 
     //COSINE
     function cosine(x){
+        var nMax = parseInt(document.getElementById("variable_n").value);
 
         var cos = 0;
         //cosine : Taylor
-        for(var n = 0; n < 50; n++){
+        for(var n = 0; n < nMax; n++){
             cos += cos_taylor(x,n);
         }
 
         return cos;
     }
 
-    //DERIVATIVE ^1
+    //DERIVATIVE
     function Derivative_prime(x){
-
-        var f, h = 1;
-
-        f = (cosine(x + h) - cosine(x - h))/2*h;
-
+        var h = parseFloat(document.getElementById("variable_h").value);
+        var f = 1.0;
+        f = (cosine(x + h) - cosine(x - h))/2.0*h;
         return f;
     }
 
-    //DERIVATIVE ^1 : slope
-    function Derivative_prime_slope(x){
-
-
-    }
-
-    //DERIVATIVE ^2
-    function Derivative_second(x){
-
-        return Derivative_prime(Derivative_prime(x));
-    }
-
-    //DERIVATIVE ^2 : slope
-    function Derivative_second_slope(x){
-
-
-    }
-
-    //DRAW EQUATION : cosine
-    myGraph.drawEquation(function(x) {
-
-        return cosine(x);
-
-    }, 'green', 2);
-
-    //DRAW EQUATION : f'
-    myGraph.drawEquation(function(x) {
-        //check h
-        return Derivative_prime(x);
-      }, 'blue', 2);
-
-    //DRAW EQUATION : f''
-      myGraph.drawEquation(function(x) {
-        return Derivative_second(x);
-      }, 'red', 2);
-
-    myGraph.drawEquation(function(x){
-        return ;
-    }, 'violet', 3);
+    /*//DERIVATIVE : slope
+    function Derivative_prime_slope(x, a, b){
+        return (a * x) + b;
+    }*/
+    
 </script>
 <!-- JS END -->
 </body>
