@@ -15,6 +15,7 @@
 <!-- BODY START -->
 <body>
 <h2>Labo 4 : Dérivation numérique</h2>
+<h3>Introduction</h3>
 <p>
     Le but de cette application est de représenter la fonction <span style="color: green;">cosinus</span> en utilisant sa série
     de Taylor (ci-dessous), ainsi que d'afficher sa <span style="color: blue;">dérivée</span> et sa <span style="color: red;">dérivée seconde</span>.
@@ -116,9 +117,25 @@
     positive, on dit que la courbe est <i>convexe</i> (pente qui monte); si elle est négative, la courbe est dite <i>concave</i> (pente qui descend); si par contre elle vaut 0,
     on a un point d'inflexion (pente nulle). Et c'est bien ce qui est illustré par nos trois courbes.
 </p>
+<h3>Mode d'emploi</h3>
 <p>
-
+    L'application permet de visualiser les <span style="color: blue;">dérivée</span> et <span style="color: red;">dérivée seconde</span>,
+    ainsi que de manipuler les valeurs pour x, h et n :
+<ul>
+    <dl>
+        <dt><strong>x</strong></dt>
+        <dd>Valeur se trouvant sur l'abcscisse.</dd>
+        <dt><strong>h</strong></dt>
+        <dd>Valeur qui, lorsqu'on tend vers 0, permet de s'approcher de plus en plus près de la pente
+            de la tangente par rapport à <span style="color: green;">f</span>.</dd>
+        <dt><strong>n</strong></dt>
+        <dd>Représente le nombre d'itération pour la fonction cosinus.</dd>
+    </dl>
+</ul>
+L'application permet d'afficher les courbes ainsi que la pente en x de manière séparée, ainsi que de
+vider le graphe histoire de permettre une meilleure visibilité.
 </p>
+<h3>Application</h3>
 <!-- Contenu -->
 <p>
     <label for="variable_x">x : <input type="number" name="variable_x" id="variable_x" value="1" step="0.01"> </label>
@@ -163,6 +180,8 @@
         var x = parseFloat(document.getElementById("variable_x").value);
         var h = parseFloat(document.getElementById("variable_h").value);
 
+        document.getElementById("slope_value").innerHTML = (Derivative_prime(x)).toFixed(2);
+
         myGraph.drawSlope(function(x) {
             return cosine(x);
         }, (x-h), (x+h), 'black', 2);
@@ -194,7 +213,7 @@
      */
     document.getElementById("show_f_2").addEventListener("click", function () {
         myGraph.drawEquation(function(x) {
-            return Derivative_prime(Derivative_prime(x));
+            return Derivative_sec(x);
         }, 'red', 2);
     });
 
@@ -233,6 +252,13 @@
         f = (cosine(x + h) - cosine(x - h))/2.0*h;
         return f;
     }
+    //DERIVATIVE
+    function Derivative_sec(x){
+        var h = parseFloat(document.getElementById("variable_h").value);
+        var f = 1.0;
+        f = (Derivative_prime(x + h) - Derivative_prime(x - h))/2.0*h;
+        return f;
+    }
 
     /*//DERIVATIVE : slope
     function Derivative_prime_slope(x, a, b){
@@ -241,6 +267,12 @@
     
 </script>
 <!-- JS END -->
+<h3>Commentaires</h3>
+<p>
+    L'affichage de la pente n'est pas optimale, surtout si h tend vers 0 (la droite se confond avec la courbe).
+    Les courbes de dérivées ne sont pas exactes non plus, notamment à cause des erreurs qui s'accumulent au fur et à mesure,
+    elles n'arrivent pas à atteindre les plafonds à 1 et -1 (sauf si h vaut 1.1 approximativement).
+</p>
 </body>
 <!-- BODY END -->
 </html>
