@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<!-- HEAD START -->
+<head>
+    <meta charset="UTF-8">
+    <title>Labo 5 | Test | Daniel</title>
+    <style>
+        body { font-family: 'Calibri', 'Arial', sans-serif; }
+    </style>
+</head>
+<!-- HEAD END -->
+<!-- BODY START -->
+<body>
+<button type="button" onclick="Simpsons()">Click Me!</button>
+<br/>
+<div id="test"></div>
+<!-- JS START -->
+<script>
+    function Simpsons() {
+        var a = 1.0, b = 1.0/Math.sqrt(2.0), t=1.0/4.0, x = 1.0;
+
+        while(a-b > 0.000000001) {
+            var y = a;
+            a = (a+b)/2.0;
+            b = Math.sqrt(b*y);
+            t = t - x * Math.pow(y-a, 2.0);
+            x = 2.0 * x;
+        }
+
+        document.getElementById("test").innerHTML = pi(a, b, t);
+    }
+
+    function pi(a, b ,t) {
+        var p = Math.pow(a+b, 2.0)/(4.0*t);
+        return p;
+    }
+</script>
+<!-- JS END -->
+</body>
+<!-- BODY END -->
+</html>
