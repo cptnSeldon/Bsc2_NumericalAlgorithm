@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<!-- HEAD START -->
+<head>
+    <meta charset="UTF-8">
+    <title>Labo 5 | Test | Lancelot</title>
+    <style>
+        body { font-family: 'Calibri', 'Arial', sans-serif; }
+    </style>
+</head>
+<!-- HEAD END -->
+<!-- BODY START -->
+<body>
+<p><button type="button" id="btnGL">Gauss-Legendre</button></p>
+<p><label for="result">Approximation de PI : </label><input type="text" id="result" readonly/></p>
+<p><a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Legendre_algorithm">Gauss-Legendre algorithm</a></p>
+<!-- JS START -->
+<script>
+
+    /**
+     * Listener
+     */
+    document.getElementById("btnGL").addEventListener("click", function(){
+        // TODO ADD PERFORMANCE
+		
+		//measurement START
+		var t0=performance.now();
+		
+        var pi = Gauss_Legendre();
+
+		//measurement END
+		var t1=performance.now();
+        
+		document.getElementById("result").value = pi;
+
+		alert("elapsed time: "+(t1-t0)+"ms");
+    });
+
+    /**
+     * Algorithme de Gauss-Legendre
+     *  - https://en.wikipedia.org/wiki/Gauss%E2%80%93Legendre_algorithm
+     */
+    function Gauss_Legendre() {
+        var a = 1.0, b = 1.0/Math.sqrt(2.0), t=1.0/4.0, x = 1.0;
+		
+       // for(var i=0; i < 100; i++) {
+	   while(a-b > 0.000000000000001) {
+            var y = a;
+            a = (a+b)/2.0;
+            b = Math.sqrt(b*y);
+            t = t - x * Math.pow(y-a, 2.0);
+            x = 2.0 * x;
+        }
+        return PI(a, b, t);
+    }
+
+    /**
+     * Fonction mathématique permettant d'approximer PI
+     * @param a
+     * @param b
+     * @param t
+     * @returns {number}
+     */
+    function PI(a, b ,t) {
+        var pi = Math.pow(a + b, 2.0) / (4.0 * t);
+        return pi;
+    }
+</script>
+<!-- JS END -->
+</body>
+<!-- BODY END -->
+</html>
