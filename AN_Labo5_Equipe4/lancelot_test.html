@@ -7,33 +7,71 @@
     <style>
         body { font-family: 'Calibri', 'Arial', sans-serif; }
     </style>
+    <script type="text/javascript" async
+            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=MML_CHTML">
+    </script>
 </head>
 <!-- HEAD END -->
 <!-- BODY START -->
 <body>
+<h2>Labo 5 : Approximation de Pi</h2>
 <p><button type="button" id="btnGL">Gauss-Legendre</button></p>
-<p><label for="result">Approximation de PI : </label><input type="text" id="result" readonly/></p>
+<p>
+    <!-- math. notation -->
+    <!-- link mathml  : http://www.wiris.com/editor/demo/en/mathml-latex.html -->
+    <!-- link mathjax : http://docs.mathjax.org/en/latest/start.html -->
+    <math xmlns="http://www.w3.org/1998/Math/MathML">
+        <mfrac>
+            <mi>&#x003C0;</mi>
+            <mn>4</mn>
+        </mfrac>
+        <mo>=</mo>
+        <msubsup>
+            <mo>&#x0222B;</mo>
+            <mn>0</mn>
+            <mn>1</mn>
+        </msubsup>
+        <mfrac>
+            <mrow>
+                <mo>d</mo>
+                <mi>x</mi>
+            </mrow>
+            <mrow>
+                <mn>1</mn>
+                <mo>+</mo>
+                <msup>
+                    <mi>x</mi>
+                    <mn>2</mn>
+                </msup>
+            </mrow>
+        </mfrac>
+    </math>
+</p>
+<table>
+    <tr>
+        <td><label for="result">Approximation de Pi : </label></td>
+        <td><input type="text" id="result" readonly/></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><label for="time">Temps d'exécution : </label></td>
+        <td><input type="text" id="time" readonly/></td>
+        <td> ms</td>
+    </tr>
+</table>
 <p><a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Legendre_algorithm">Gauss-Legendre algorithm</a></p>
 <!-- JS START -->
 <script>
-
     /**
      * Listener
      */
     document.getElementById("btnGL").addEventListener("click", function(){
-        // TODO ADD PERFORMANCE
-		
-		//measurement START
-		var t0=performance.now();
-		
-        var pi = Gauss_Legendre();
-
-		//measurement END
-		var t1=performance.now();
-        
-		document.getElementById("result").value = pi;
-
-		alert("elapsed time: "+(t1-t0)+"ms");
+		var p1 = performance.now();
+//        var pi = Gauss_Legendre();
+        var pi=Simpson();
+		var p2 = performance.now();
+        document.getElementById("result").value = pi;
+        document.getElementById("time").value = (p2-p1);
     });
 
     /**
@@ -41,30 +79,52 @@
      *  - https://en.wikipedia.org/wiki/Gauss%E2%80%93Legendre_algorithm
      */
     function Gauss_Legendre() {
-        var a = 1.0, b = 1.0/Math.sqrt(2.0), t=1.0/4.0, x = 1.0;
-		
-       // for(var i=0; i < 100; i++) {
-	   while(a-b > 0.000000000000001) {
+        var a = 1.0, b = 1.0/Math.sqrt(2.0), t=1.0/4.0, x = 1.0, i = 0.0;
+       for(i; i < 3.0; i++) {
+      //while(a-b > 0.00001) {
             var y = a;
             a = (a+b)/2.0;
             b = Math.sqrt(b*y);
-            t = t - x * Math.pow(y-a, 2.0);
+            t = t - x *Math.pow(y-a, 2.0);
             x = 2.0 * x;
         }
+
         return PI(a, b, t);
     }
+	
 
     /**
-     * Fonction math�matique permettant d'approximer PI
+     * Fonction mathématique permettant d'approximer PI
      * @param a
      * @param b
      * @param t
      * @returns {number}
      */
     function PI(a, b ,t) {
+        alert(a+" "+b+" "+t);
         var pi = Math.pow(a + b, 2.0) / (4.0 * t);
         return pi;
     }
+	
+	//--------fonction Simpson
+	function Simpson() {
+		var s=0.0;
+		var p=0.001;
+		var nb=1.0/p;
+		
+		var a=0.0;
+		var b=1.0;
+		var k=1.0;
+		
+		
+		for(k;k<nb;k++)
+		{
+			s+=(1.0+k%2.0)*4.0/(1.0+Math.pow(a+k*p,2.0));
+		}
+		s=p/3.0*(4.0/(1.0+Math.pow(a,2.0))+4.0/(1.0+Math.pow(b,2.0))+2.0*s);
+		return s;
+	}
+	
 </script>
 <!-- JS END -->
 </body>
