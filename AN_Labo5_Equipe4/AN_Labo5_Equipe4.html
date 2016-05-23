@@ -3,7 +3,7 @@
 <!-- HEAD START -->
 <head>
     <meta charset="UTF-8">
-    <title>Labo 5 | Test | Daniel</title>
+    <title>Labo 5 | Equipe 4</title>
     <style>
         body { font-family: 'Calibri', 'Arial', sans-serif; }
     </style>
@@ -16,6 +16,21 @@
 <body>
 <h2>Labo 5 : Approximation de Pi</h2>
 <p><button type="button" id="btnGL">Gauss-Legendre</button></p>
+<table>
+    <tr>
+        <td><label for="result">Approximation de Pi</label></td>
+        <td>:</td>
+        <td><input type="text" id="result" readonly/></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><label for="time">Temps d'exécution</label></td>
+        <td>:</td>
+        <td><input type="text" id="time" readonly/></td>
+        <td> ms</td>
+    </tr>
+</table>
+<p><a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Legendre_algorithm">Gauss-Legendre algorithm</a></p>
 <p>
     <!-- math. notation -->
     <!-- link mathml  : http://www.wiris.com/editor/demo/en/mathml-latex.html -->
@@ -47,19 +62,6 @@
         </mfrac>
     </math>
 </p>
-<table>
-    <tr>
-        <td><label for="result">Approximation de Pi : </label></td>
-        <td><input type="text" id="result" readonly/></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td><label for="time">Temps d'exécution : </label></td>
-        <td><input type="text" id="time" readonly/></td>
-        <td> ms</td>
-    </tr>
-</table>
-<p><a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Legendre_algorithm">Gauss-Legendre algorithm</a></p>
 <!-- JS START -->
 <script>
     /**
@@ -69,8 +71,10 @@
         var p1 = performance.now();
         var pi = Gauss_Legendre();
         var p2 = performance.now();
+
+        // Affichage du résultat
         document.getElementById("result").value = pi;
-        document.getElementById("time").value = (p2-p1);
+        document.getElementById("time").value = (p2-p1).toFixed(3);
     });
 
     /**
@@ -80,8 +84,9 @@
     function Gauss_Legendre() {
         var a = 1.0, b = 1.0/Math.sqrt(2.0), t=1.0/4.0, x = 1.0, i = 0;
 
+        // Avec trois itérations, on atteint
+        // 3.1415926535897932382...
         for(i; i < 3; i++) {
-//        while(a-b > 0.00001) {
             var y = a;
             a = (a+b)/2.0;
             b = Math.sqrt(b*y);
@@ -89,6 +94,7 @@
             x = 2.0 * x;
         }
 
+        // Renvoie la valeur de Pi approximée
         return PI(a, b, t);
     }
 
@@ -100,8 +106,7 @@
      * @returns {number}
      */
     function PI(a, b ,t) {
-        var pi = Math.pow(a + b, 2.0) / (4.0 * t);
-        return pi;
+        return Math.pow(a + b, 2.0)/ (4.0 * t);
     }
 </script>
 <!-- JS END -->
