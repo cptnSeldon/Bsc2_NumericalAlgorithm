@@ -15,7 +15,47 @@
 <!-- BODY START -->
 <body>
 <h2>Labo 5 : Approximation de Pi</h2>
-<h3>Gauss-Legendre</h3>
+<h3>Introduction</h3>
+<p>
+    Le but de ce laboratoire est d'approximer le nombre <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>&#x003C0;</mi></math>
+    en utilisant les intégrales. La formule qui a été utilisée est la suivante :</p>
+<!-- math. notation -->
+<!-- link mathml  : http://www.wiris.com/editor/demo/en/mathml-latex.html -->
+<!-- link mathjax : http://docs.mathjax.org/en/latest/start.html -->
+<p><math xmlns="http://www.w3.org/1998/Math/MathML">
+    <mfrac>
+        <mi>&#x003C0;</mi>
+        <mn>4</mn>
+    </mfrac>
+    <mo>=</mo>
+    <msubsup>
+        <mo>&#x0222B;</mo>
+        <mn>0</mn>
+        <mn>1</mn>
+    </msubsup>
+    <mfrac>
+        <mrow>
+            <mo>d</mo>
+            <mi>x</mi>
+        </mrow>
+        <mrow>
+            <mn>1</mn>
+            <mo>+</mo>
+            <msup>
+                <mi>x</mi>
+                <mn>2</mn>
+            </msup>
+        </mrow>
+    </mfrac>
+</math></p>
+<p>
+    Les deux méthodes d'intégration numérique qui sont présentées ici sont celles de Simpson et de Gauss-Legendre.<br/>
+    Avec la méthode Gauss-Legendre, avec 25 itérations, on peut arriver à calculer les 45 premiers millions
+    de décimales après la virgule. En principe, elle est plus précise que celle de Simpson.
+</p>
+<p>Les formules précises ainsi que leur développement se trouvent dans les liens en dessous des méthodes.</p>
+<h3>Application</h3>
+<h4>Gauss-Legendre</h4>
 <p><button type="button" id="btnGL">Calculer</button></p>
 <table>
     <tr>
@@ -31,7 +71,8 @@
         <td> ms</td>
     </tr>
 </table>
-<h3>Simpson</h3>
+<p><a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Legendre_algorithm">Algorithme de Gauss-Legendre</a></p>
+<h4>Simpson</h4>
 <p><button type="button" id="btnS">Calculer</button></p>
 <table>
     <tr>
@@ -47,38 +88,18 @@
         <td> ms</td>
     </tr>
 </table>
-<p><a href="https://en.wikipedia.org/wiki/Gauss%E2%80%93Legendre_algorithm">Gauss-Legendre algorithm</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Simpson%27s_rule">Méthode de Simpson</a> </p>
+<!-- RAPPORT -->
+<h3>Mode d'emploi</h3>
 <p>
-    <!-- math. notation -->
-    <!-- link mathml  : http://www.wiris.com/editor/demo/en/mathml-latex.html -->
-    <!-- link mathjax : http://docs.mathjax.org/en/latest/start.html -->
-    <math xmlns="http://www.w3.org/1998/Math/MathML">
-        <mfrac>
-            <mi>&#x003C0;</mi>
-            <mn>4</mn>
-        </mfrac>
-        <mo>=</mo>
-        <msubsup>
-            <mo>&#x0222B;</mo>
-            <mn>0</mn>
-            <mn>1</mn>
-        </msubsup>
-        <mfrac>
-            <mrow>
-                <mo>d</mo>
-                <mi>x</mi>
-            </mrow>
-            <mrow>
-                <mn>1</mn>
-                <mo>+</mo>
-                <msup>
-                    <mi>x</mi>
-                    <mn>2</mn>
-                </msup>
-            </mrow>
-        </mfrac>
-    </math>
+    On peut choisir de calculer <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>&#x003C0;</mi></math> selon une méthode ou l'autre.
+    <br/>Les boutons permettent de lancer l'algorithme correspondant. L'approximation est affichée dans le premier champ, le temps d’exécution est affiché dans le suivant, en millisecondes.
 </p>
+<h3>Commentaires</h3>
+<p>En javascript les nombres sont limité à 17 décimales.
+    La méthode de Gauss-Legendre utilise les méthodes Math.pow() et Math.sqrt() qui arrandissent le nombre à 16 décimales et le résultat est donné avec 15 décimales.
+    La méthode de Simpsons permet d'obtenir un résultat avec 16 décimales, mais la valeur est moins précise que la méthode Gauss-Legendre.
+    Avec Gauss-Legendre, on obtiend le nombre de décimales souhaitées en seulement 3 itérations.</p>
 <!-- JS START -->
 <script>
     /************************************************************************
