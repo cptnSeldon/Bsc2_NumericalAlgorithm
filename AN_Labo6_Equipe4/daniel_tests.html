@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<!-- HEAD START -->
+<head>
+    <meta charset="UTF-8">
+    <title>Labo 6 | Equipe 4</title>
+    <style>
+        body { font-family: 'Calibri', 'Arial', sans-serif; }
+        canvas { background-color: #efefef; }
+    </style>
+</head>
+<!-- HEAD END -->
+<!-- BODY START -->
+<body>
+<h2>Labo 6 : </h2>
+<!-- JS START -->
+<canvas height="542" id="canvas" width="542"></canvas>
+<script src="paperjs-v0.9.25/dist/paper-full.min.js">
+    /**
+     * Euler's Method
+     * @param f     : differential-equation
+     * @param x1    : initial condition
+     * @param y1    : initial condition
+     * @param x2    : ending
+     * @param h     : steps
+     * @returns {*}
+     */
+    function eulersMethod(f, x1, y1, x2, h) {
+        // Header
+        console.log("\tX\t|\tY\t");
+        console.log("------------------------------------");
+
+        // Initial Variables
+        var x=x1, y=y1;
+
+        // While we're not done yet
+        // Both sides of the OR let you do Euler's Method backwards
+        while ((x<x2 && x1<x2) || (x>x2 && x1>x2)) {
+            // Print what we have
+            console.log("\t" + x + "\t|\t" + y);
+
+            drawVector(x, y);
+            var init = new Point(x, y);
+
+            // Calculate the next values
+            y += h*f(x, y)
+            x += h;
+
+            var end = new Point(x, y);
+            //drawVector(init, end);
+        }
+
+        return y;
+    }
+
+    function cooling(x, y) {
+        return Math.pow(t, 2) + Math.pow(y, 2);
+    }
+
+    eulersMethod(cooling, -100, -100, 100, 5);
+
+    /************************************************************************
+     * Paper.js
+     ************************************************************************/
+    function drawVector(init, end) {
+        var vector = end - init;
+        vector.strokeColor = '#e4141b';
+        vector.strokeWidth = 0.75;
+        var line = new Path();
+        line.lineBy(vector);
+    }
+</script>
+<!-- JS END -->
+</body>
+<!-- BODY END -->
+</html>
