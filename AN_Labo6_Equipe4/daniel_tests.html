@@ -14,61 +14,84 @@
 <body>
 <h2>Labo 6 : </h2>
 <!-- JS START -->
-<canvas height="542" id="canvas" width="542"></canvas>
-<script src="paperjs-v0.9.25/dist/paper-full.min.js">
+<p><input type="button" value="TEST" id="btn"/></p>
+<p><canvas height="542" id="myCanvas" width="542"></canvas></p>
+<script src="./AN_Labo6_Equipe4.js"></script>
+<script>
+    // INIT GRAPH
+    var myGraph;
+    var listS = [];
+    var listE = [];
+    document.getElementById("btn").addEventListener("click", function(){
+        myGraph = new Graph({
+            canvasId: 'myCanvas',
+            minX: -1.5,
+            minY: -1.4,
+            maxX: 1.5,
+            maxY: 1.4,
+            unitsPerTick: 0.5
+        });
+        for(var i=0; i<1; i=i+0.1)
+            eulersMethod(cooling, -1.5, -1.4, 1.5, i);
+
+        myGraph.drawLine(listS, listE, 'red', 2);
+
+    });
+
     /**
      * Euler's Method
+     *
+     * https://rosettacode.org/wiki/Euler_method#JavaScript
+     *
      * @param f     : differential-equation
-     * @param x1    : initial condition
+     * @param t1    : initial condition
      * @param y1    : initial condition
-     * @param x2    : ending
+     * @param t2    : ending
      * @param h     : steps
      * @returns {*}
      */
-    function eulersMethod(f, x1, y1, x2, h) {
+    function eulersMethod(f, t1, y1, t2, h) {
         // Header
-        console.log("\tX\t|\tY\t");
-        console.log("------------------------------------");
+//        console.log("\tT\t|\tY\t");
+//        console.log("------------------------------------");
 
         // Initial Variables
-        var x=x1, y=y1;
+        var t=t1, y=y1;
+
 
         // While we're not done yet
         // Both sides of the OR let you do Euler's Method backwards
-        while ((x<x2 && x1<x2) || (x>x2 && x1>x2)) {
+        while ((t<t2 && t1<t2) || (t>t2 && t1>t2)) {
             // Print what we have
-            console.log("\t" + x + "\t|\t" + y);
+//            console.log("\t" + t + "\t|\t" + y);
 
-            drawVector(x, y);
-            var init = new Point(x, y);
+            var start = {x: t, y:y};
+            listS.push(start);
 
             // Calculate the next values
-            y += h*f(x, y)
-            x += h;
+            y += h*f(t, y)
+            t += h;
 
-            var end = new Point(x, y);
-            //drawVector(init, end);
+            var end = {x: t, y:y};
+
+
+            listE.push(end);
+
+
+            // Calculate the next values
+            y += 0.1*f(t, y)
+            t += 0.1;
         }
 
         return y;
     }
 
-    function cooling(x, y) {
+    function cooling(t, y) {
         return Math.pow(t, 2) + Math.pow(y, 2);
     }
 
-    eulersMethod(cooling, -100, -100, 100, 5);
 
-    /************************************************************************
-     * Paper.js
-     ************************************************************************/
-    function drawVector(init, end) {
-        var vector = end - init;
-        vector.strokeColor = '#e4141b';
-        vector.strokeWidth = 0.75;
-        var line = new Path();
-        line.lineBy(vector);
-    }
+
 </script>
 <!-- JS END -->
 </body>
