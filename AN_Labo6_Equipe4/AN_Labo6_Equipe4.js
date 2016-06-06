@@ -137,16 +137,16 @@ Graph.prototype.drawEquation = function(equation, color, thickness) {
     context.restore();
 };
 
-Graph.prototype.drawLine = function(start, end, color, thickness) {
+Graph.prototype.drawLine = function(list, color, thickness) {
     var context = this.context;
     context.save();
     context.save();
     this.transformContext();
 
     context.beginPath();
-    for(var i = 0; i < start.length; i++) {
-        context.moveTo(start[i].x, start[i].y);
-        context.lineTo(end[i].x, end[i].y);
+    for(var i = 0; i < list.length; i++) {
+        context.moveTo(list[i][0], list[i][1]);
+        context.lineTo(list[i][2], list[i][3]);
     }
 
     context.restore();

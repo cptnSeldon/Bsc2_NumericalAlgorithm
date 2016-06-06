@@ -20,8 +20,9 @@
 <script>
     // INIT GRAPH
     var myGraph;
-    var listS = [];
-    var listE = [];
+    var list = [[]];
+    var index = 0;
+//    var listE = [];
     document.getElementById("btn").addEventListener("click", function(){
         myGraph = new Graph({
             canvasId: 'myCanvas',
@@ -31,10 +32,15 @@
             maxY: 1.4,
             unitsPerTick: 0.5
         });
-        for(var i=0; i<1; i=i+0.1)
-            eulersMethod(cooling, -1.5, -1.4, 1.5, i);
 
-        myGraph.drawLine(listS, listE, 'red', 2);
+        var i = 0;
+        for(i; i<15; i++) {
+            eulersMethod(cooling, 0.1*i, -1.4, 1.5, 0.1);
+            eulersMethod(cooling, -0.1*i, -1.4, 1.5, 0.1);
+        }
+        myGraph.drawLine(list, 'red', 2);
+        list = [[]];
+//        alert(list);
 
     });
 
@@ -57,7 +63,7 @@
 
         // Initial Variables
         var t=t1, y=y1;
-
+//        var list = [];
 
         // While we're not done yet
         // Both sides of the OR let you do Euler's Method backwards
@@ -65,17 +71,18 @@
             // Print what we have
 //            console.log("\t" + t + "\t|\t" + y);
 
-            var start = {x: t, y:y};
-            listS.push(start);
+            var x1 = t;
+            var y1 = y;
 
             // Calculate the next values
-            y += h*f(t, y)
+            y += h*f(t, y);
             t += h;
 
-            var end = {x: t, y:y};
 
+            var x2 = t;
+            var y2 = y;
 
-            listE.push(end);
+            list.push([x1, y1, x2, y2]);
 
 
             // Calculate the next values
