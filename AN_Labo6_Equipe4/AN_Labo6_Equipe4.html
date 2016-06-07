@@ -7,30 +7,141 @@
     <style>
         body { font-family: 'Calibri', 'Arial', sans-serif; }
     </style>
-    <!--<script src="paperjs-v0.9.25/dist/paper-core.min.js"></script>-->
-    <script src="paperjs-v0.9.25/dist/paper-full.min.js"></script>
 </head>
 <!-- HEAD END -->
 <!-- BODY START -->
 <p>
 <h2>Labo 6 : Champ de vecteurs</h2>
 <h3>Introduction</h3>
-<p>Le but de ce laboratoire est de représenter un champ de vecteurs, où chaque vecteur réagit à la force qui y est appliquée
-via l'interaction de l'utilisateur via la souris.</p>
-<h3>Méthodologie</h3>
-<h3>Commentaires</h3>
-<h3>Références</h3>
-<p>La bibliothèque qui a été utilisée pour créer les vecteurs ainsi que la trace de la souris dans le champ est PaperJS.
-On s'est inspiré du code fourni avec les tutoriels présentés ci-dessous : </p>
-<ul>
-    <li><a href="http://paperjs.org/tutorials/interaction/creating-mouse-tools/">PaperJS: Creating mouse tool</a></li>
-    <li><a href="http://paperjs.org/tutorials/geometry/vector-geometry/">PaperJS: Vector Geometry</a></li>
-</ul>
-
+<p>
+    Le but de ce laboratoire et de représenter un champ de vecteurs, où
+    pour chaque points on associe un vecteur qui a un certain sens et une
+    certaine direction. Pour ce faire, on a intégré la méthode de résolution
+    d'équation différentielle de Euler afin d'essayer d'obtenir un résultat
+    qui soit le plus correct possible.
+</p>
+<h3>Programme</h3>
 <!-- JS START -->
+<p><input type="button" value="TEST" id="btn"/></p>
+<p><canvas height="542" id="myCanvas" width="542"></canvas></p>
+<script src="./AN_Labo6_Equipe4.js"></script>
 <script>
+    // INIT GRAPH
+    var myGraph;
+    var list = [[]];
+    var index = 0;
+    //    var listE = [];
+    document.getElementById("btn").addEventListener("click", function(){
+        myGraph = new Graph({
+            canvasId: 'myCanvas',
+            minX: -1.5,
+            minY: -1.4,
+            maxX: 1.5,
+            maxY: 1.4,
+            unitsPerTick: 0.5
+        });
+
+        var i = -15;
+        for(i; i<15; i++) {
+            eulersMethod(cooling, 0.1*i, -1.4, 2.0, 0.1);
+        }
+//        for(i=-15; i<15; i++) {
+//            eulersMethod(cooling, 0.1*i, 0, 2.0, 0.1);
+//        }
+        myGraph.drawLine(list, 'red', 2);
+        list = [[]];
+//        alert(list);
+
+    });
+
+    /**
+     * Euler's Method
+     *
+     * https://rosettacode.org/wiki/Euler_method#JavaScript
+     *
+     * @param f     : differential-equation
+     * @param t1    : initial condition
+     * @param y1    : initial condition
+     * @param t2    : ending
+     * @param h     : steps
+     * @returns {*}
+     */
+    function eulersMethod(f, t1, y1, t2, h) {
+        // Header
+//        console.log("\tT\t|\tY\t");
+//        console.log("------------------------------------");
+
+        // Initial Variables
+        var t=t1, y=y1;
+//        var list = [];
+
+        // While we're not done yet
+        // Both sides of the OR let you do Euler's Method backwards
+        while ((t<t2 && t1<t2) || (t>t2 && t1>t2)) {
+            // Print what we have
+//            console.log("\t" + t + "\t|\t" + y);
+
+            var x1 = t;
+            var y1 = y;
+
+            // Calculate the next values
+            y += h*f(t, y);
+            t += h;
+
+
+            var x2 = t;
+            var y2 = y;
+
+            list.push([x1, y1, x2, y2]);
+
+
+            // Calculate the next values
+            y += 0.08*f(t, y)
+            t += 0.08;
+        }
+
+        return y;
+    }
+
+    function cooling(t, y) {
+        return Math.pow(t, 2) + Math.pow(y, 2);
+    }
 </script>
 <!-- JS END -->
+<h3>Méthodologie</h3>
+<p>
+    Notre projet comporte une fonction principale qui est celle de Euler
+    (formule ou lien qui s'y rapporte). Elle prend en paramètre :
+<ul>
+    <li>l'équation différentielle f</li>
+    <li>la condition initiale t1</li>
+    <li>la condition initiale y1</li>
+    <li>la variable de fin t2</li>
+    <li>le pas h</li>
+</ul>
+Grâce à celà, on arrive à calculer où se situent les vecteurs, leur
+direction et leur sens.
+<ul>
+    <li><a href="https://fr.wikipedia.org/wiki/M%C3%A9thode_d%27Euler">Méthode de Euler</a></li>
+    <li><a href="https://upload.wikimedia.org/wikipedia/commons/e/ee/Forward_Euler_method_illustration.png">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ee/Forward_Euler_method_illustration.png"
+             title="source: wikipedia.org" /><br/>Illustration de la méthode de Euler</a></li>
+</ul>
+</p>
+<h3>Commentaires</h3>
+<p>
+    La tâche s'est avérée plus ardue que ce qu'on imaginait, notament au
+    niveau de l'intégration de la formule de telle manière que les valeurs
+    pour x et y illustrent bien un champ vectoriel. On a eu des résultats
+    à peu près corrects mais ça ressemblait plus à du bricolage qu'à autre
+    chose, tandis que ce qui est présenté ici est correct en soit mais
+    ne représente pas un champ vectoriel à proprement parlé.
+<ul>
+    <li><a href="http://imgur.com/xAgxdfw"><img src="http://i.imgur.com/xAgxdfw.png" title="source: imgur.com" /><br/>Test bricolage 1</a></li>
+    <li><a href="http://imgur.com/ER0k0p1"><img src="http://i.imgur.com/ER0k0p1.png" title="source: imgur.com" /><br/>Test bricolage 2</a></li>
+    <li><a href="http://imgur.com/uFsZJQE"><img src="http://i.imgur.com/uFsZJQE.png" title="source: imgur.com" /><br/>Test bricolage 3</a></li>
+</ul>
+</p>
 </body>
 <!-- BODY END -->
 </html>
