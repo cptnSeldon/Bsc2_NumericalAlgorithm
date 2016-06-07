@@ -146,6 +146,7 @@ Graph.prototype.drawLine = function(list, color, thickness) {
     context.beginPath();
     for(var i = 0; i < list.length; i++) {
         context.moveTo(list[i][0], list[i][1]);
+        context.arc(list[i][0], list[i][1], 0.01, 0, 2 * Math.PI, false);
         context.lineTo(list[i][2], list[i][3]);
     }
 

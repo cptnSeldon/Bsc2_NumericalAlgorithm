@@ -6,6 +6,7 @@
     <title>Labo 6 | Equipe 4</title>
     <style>
         body { font-family: 'Calibri', 'Arial', sans-serif; }
+	canvas { background-color: #FAFAFA; }
     </style>
 </head>
 <!-- HEAD END -->
@@ -24,7 +25,7 @@
 </p>
 <h3>Programme</h3>
 <!-- JS START -->
-<p><input type="button" value="TEST" id="btn"/></p>
+<p><input type="button" value="Show Graph" id="btn"/></p>
 <p><canvas height="542" id="myCanvas" width="542"></canvas></p>
 <script src="./AN_Labo6_Equipe4.js"></script>
 <script>
@@ -32,7 +33,6 @@
     var myGraph;
     var list = [[]];
     var index = 0;
-    //    var listE = [];
     document.getElementById("btn").addEventListener("click", function(){
         myGraph = new Graph({
             canvasId: 'myCanvas',
@@ -47,13 +47,8 @@
         for(i; i<15; i++) {
             eulersMethod(cooling, 0.1*i, -1.4, 2.0, 0.1);
         }
-//        for(i=-15; i<15; i++) {
-//            eulersMethod(cooling, 0.1*i, 0, 2.0, 0.1);
-//        }
         myGraph.drawLine(list, 'red', 2);
         list = [[]];
-//        alert(list);
-
     });
 
     /**
@@ -69,20 +64,12 @@
      * @returns {*}
      */
     function eulersMethod(f, t1, y1, t2, h) {
-        // Header
-//        console.log("\tT\t|\tY\t");
-//        console.log("------------------------------------");
-
         // Initial Variables
         var t=t1, y=y1;
-//        var list = [];
 
         // While we're not done yet
         // Both sides of the OR let you do Euler's Method backwards
         while ((t<t2 && t1<t2) || (t>t2 && t1>t2)) {
-            // Print what we have
-//            console.log("\t" + t + "\t|\t" + y);
-
             var x1 = t;
             var y1 = y;
 
@@ -90,18 +77,15 @@
             y += h*f(t, y);
             t += h;
 
-
             var x2 = t;
             var y2 = y;
 
             list.push([x1, y1, x2, y2]);
 
-
             // Calculate the next values
             y += 0.08*f(t, y)
             t += 0.08;
         }
-
         return y;
     }
 
